@@ -14,7 +14,7 @@ pub enum Expression {
     Ident(String),
 }
 
-fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
+pub fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
     let comment = just(";")
         .then(take_until(text::newline().or(end())))
         .padded();
@@ -79,7 +79,9 @@ mod tests {
             let mut file = File::create(path!("src/test.ast")).unwrap();
             file.write_all(content.as_bytes()).unwrap();
         }
-        let actual = std::fs::read_to_string(path!("src/test.ast")).unwrap();
+        let actual = std::fs::read_to_string(path!("src/test.ast"))
+            .unwrap()
+            .replace('\r', "");
         assert_eq!(&content, &actual)
     }
 }
