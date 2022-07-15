@@ -4,6 +4,9 @@ use chumsky::prelude::*;
 pub struct Program {
     exprs: Vec<Expression>,
 }
+
+const EXTENDED_IDENTIFIER_CHARS: &str = "!$%&*+-/:<=>?@^_~";
+
 #[derive(Debug)]
 pub enum Expression {
     List(Vec<Box<Expression>>),
@@ -20,10 +23,19 @@ fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
             .map(|n| Expression::Integer(n.parse::<i64>().unwrap()))
             .padded()
             .labelled("number");
-        let ident = text::ident::<char, Simple<char>>()
-            .padded()
-            .map(Expression::Ident)
-            .labelled("ident");
+        let ident =
+            filter(|c: &char| c.is_ascii_alphabetic() || EXTENDED_IDENTIFIER_CHARS.contains(*c))
+                .map(Some)
+                .chain::<char, _, _>(
+                    filter(|c: &char| {
+                        c.is_ascii_alphanumeric() || EXTENDED_IDENTIFIER_CHARS.contains(*c)
+                    })
+                    .repeated(),
+                )
+                .collect()
+                .padded()
+                .map(Expression::Ident)
+                .labelled("ident");
         let list = expr
             .map(Box::new)
             .repeated()

@@ -32,6 +32,9 @@ Program {
         List(
             [
                 Ident(
+                    "+",
+                ),
+                Ident(
                     "a",
                 ),
                 Integer(
@@ -41,6 +44,9 @@ Program {
         ),
         List(
             [
+                Ident(
+                    "-",
+                ),
                 Ident(
                     "b",
                 ),
