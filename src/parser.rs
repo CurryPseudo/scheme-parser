@@ -2,15 +2,18 @@ use chumsky::prelude::*;
 
 #[derive(Debug)]
 pub struct Program {
-    pub exprs: Vec<Expression>,
-    pub last_expr: Expression,
+    pub exprs: Vec<Spanned<Expression>>,
+    pub last_expr: Spanned<Expression>,
 }
 
 const EXTENDED_IDENTIFIER_CHARS: &str = "!$%&*+-/:<=>?@^_~";
 
+pub type Span = std::ops::Range<usize>;
+pub type Spanned<T> = (T, Span);
+
 #[derive(Debug)]
 pub enum Expression {
-    List(Vec<Box<Expression>>),
+    List(Vec<Box<Spanned<Expression>>>),
     Integer(i64),
     Ident(String),
 }
@@ -42,7 +45,9 @@ pub fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
             .collect::<Vec<_>>()
             .map(Expression::List)
             .labelled("list");
-        num.or(ident).or(list)
+        num.or(ident)
+            .or(list)
+            .map_with_span(|expr, span| (expr, span))
     })
     .padded_by(comment.repeated())
     .padded()
@@ -66,6 +71,7 @@ pub fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ariadne::{Color, Label, Report, ReportKind, Source};
     use manifest_dir_macros::*;
     use pretty_assertions::assert_eq;
     use std::ffi::OsStr;
@@ -105,12 +111,50 @@ mod tests {
                 continue;
             }
             let input = read_to_string(&path).unwrap();
-            let result = parser().parse(input).unwrap_err();
-            let mut content = String::new();
+            let result = parser().parse(input.as_str()).unwrap_err();
+            let mut content = Vec::new();
             for error in result {
-                use std::fmt::Write;
-                writeln!(content, "{}", error).unwrap();
+                let report = Report::<Span>::build::<()>(ReportKind::Error, (), error.span().start);
+                let report = match error.reason() {
+                    chumsky::error::SimpleReason::Unexpected => report
+                        .with_message(format!(
+                            "{}, expected {}",
+                            if error.found().is_some() {
+                                "Unexpected char in input"
+                            } else {
+                                "Unexpected end of input"
+                            },
+                            if error.expected().len() == 0 {
+                                "something else".to_string()
+                            } else {
+                                error
+                                    .expected()
+                                    .map(|expected| match expected {
+                                        Some(expected) => expected.to_string(),
+                                        None => "end of input".to_string(),
+                                    })
+                                    .collect::<Vec<_>>()
+                                    .join(", ")
+                            }
+                        ))
+                        .with_label(Label::new(error.span()).with_message(
+                            if let Some(c) = error.found() {
+                                format!("Unexpected char {}", c)
+                            } else {
+                                "Unexpected end of input".to_string()
+                            },
+                        )),
+                    chumsky::error::SimpleReason::Unclosed { span, delimiter } => todo!(),
+                    chumsky::error::SimpleReason::Custom(_) => todo!(),
+                };
+                //report.finish().print(Source::from(&input)).unwrap();
+                report
+                    .with_config(ariadne::Config::default().with_color(false))
+                    .finish()
+                    .write(Source::from(&input), &mut content)
+                    .unwrap();
             }
+            let content = String::from_utf8(content).unwrap();
             let mut error_path = path;
             error_path.set_extension("err");
             assert_eq_or_override(&error_path, &content);
