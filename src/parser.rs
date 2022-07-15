@@ -8,7 +8,7 @@ pub struct Program {
 pub enum Expression {
     List(Vec<Box<Expression>>),
     Integer(i64),
-    Symbol(String),
+    Ident(String),
 }
 
 fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
@@ -22,7 +22,7 @@ fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
             .labelled("number");
         let ident = text::ident::<char, Simple<char>>()
             .padded()
-            .map(Expression::Symbol)
+            .map(Expression::Ident)
             .labelled("ident");
         let list = expr
             .map(Box::new)
@@ -40,17 +40,30 @@ fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
         .then_ignore(end().recover_with(skip_then_retry_until([])))
 }
 
-#[test]
-fn test_parser() {
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use manifest_dir_macros::*;
     use pretty_assertions::assert_eq;
-    let input = include_str!("test.scm");
-    let result = parser().parse(input).unwrap_or_else(|e| {
-        use std::fmt::Write;
-        let mut s = String::new();
-        for e in e {
-            writeln!(s, "{}", e).unwrap();
+    use std::fs::File;
+    use std::io::Write;
+    #[test]
+    fn test_parser() {
+        let input = include_str!("test.scm");
+        let result = parser().parse(input).unwrap_or_else(|e| {
+            use std::fmt::Write;
+            let mut s = String::new();
+            for e in e {
+                writeln!(s, "{}", e).unwrap();
+            }
+            panic!("{}", s)
+        });
+        let content = format!("{:#?}", result);
+        if cfg!(feature = "override_test") {
+            let mut file = File::create(path!("src/test.ast")).unwrap();
+            file.write_all(content.as_bytes()).unwrap();
         }
-        panic!("{}", s)
-    });
-    assert_eq!(&format!("{:#?}", result), include_str!("test.ast"))
+        let actual = std::fs::read_to_string(path!("src/test.ast")).unwrap();
+        assert_eq!(&content, &actual)
+    }
 }

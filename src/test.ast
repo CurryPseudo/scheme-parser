@@ -26,12 +26,12 @@ Program {
                 ),
             ],
         ),
-        Symbol(
+        Ident(
             "a",
         ),
         List(
             [
-                Symbol(
+                Ident(
                     "a",
                 ),
                 Integer(
@@ -41,10 +41,10 @@ Program {
         ),
         List(
             [
-                Symbol(
+                Ident(
                     "b",
                 ),
-                Symbol(
+                Ident(
                     "ada",
                 ),
             ],
