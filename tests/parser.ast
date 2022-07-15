@@ -42,18 +42,18 @@ Program {
                 ),
             ],
         ),
-        List(
-            [
-                Ident(
-                    "-",
-                ),
-                Ident(
-                    "b",
-                ),
-                Ident(
-                    "ada",
-                ),
-            ],
-        ),
     ],
+    last_expr: List(
+        [
+            Ident(
+                "-",
+            ),
+            Ident(
+                "b",
+            ),
+            Ident(
+                "ada",
+            ),
+        ],
+    ),
 }

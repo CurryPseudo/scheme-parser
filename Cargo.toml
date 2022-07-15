@@ -13,4 +13,4 @@ manifest-dir-macros = "0.1.16"
 pretty_assertions = "1.2.1"
 
 [features]
-override_test = []
+override-test = []
