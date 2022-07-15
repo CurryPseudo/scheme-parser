@@ -15,6 +15,9 @@ pub enum Expression {
 }
 
 fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
+    let comment = just(";")
+        .then(take_until(text::newline().or(end())))
+        .padded();
     let expr = recursive(|expr| {
         let num = just('-')
             .or_not()
@@ -46,7 +49,8 @@ fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
         num.or(ident).or(list)
     })
     .labelled("expression");
-    expr.padded()
+    expr.padded_by(comment.repeated())
+        .padded()
         .repeated()
         .map(|exprs| Program { exprs })
         .then_ignore(end().recover_with(skip_then_retry_until([])))
