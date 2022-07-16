@@ -1,7 +1,9 @@
-Error: Unexpected end of input, expected <expression>
+Error: Unclosed delimiter ( while parsing list
    ╭─[tests/parse/error/list_unclosed_right1.scm:1:10]
    │
  1 │ (3132 ( a
-   ·          ┬  
-   ·          ╰── Unexpected end of file
+   ·       ┬  ┬  
+   ·       ╰───── Unclosed delimiter (
+   ·          │  
+   ·          ╰── Must be closed before this end of file
 ───╯

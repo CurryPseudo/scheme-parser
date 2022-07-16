@@ -18,32 +18,31 @@ pub enum Expression {
 
 fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
     let expr = recursive(|expr| {
-        let primitive = select! {
-            Token::Integer(v) => Expression::Integer(v),
-            Token::Ident(v) => Expression::Ident(v),
-        };
+        let primitive = filter_map(|span, token| match token {
+            Token::Integer(v) => Ok(Expression::Integer(v)),
+            Token::Ident(v) => Ok(Expression::Ident(v)),
+            other => Err(Simple::expected_input_found(
+                span,
+                Some(Some(Token::Keyword("<primitive>"))),
+                Some(other),
+            )),
+        });
         let list = expr
             .repeated()
             .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
             .collect::<Vec<_>>()
             .map(Expression::List)
-            .labelled("list");
-        primitive
-            .or(list)
-            .map_err(|e: Simple<Token>| {
-                Simple::expected_input_found(
-                    e.span(),
-                    vec![Some(Token::Keyword("<expression>"))],
-                    e.found().cloned(),
-                )
-            })
             .recover_with(nested_delimiters(
                 Token::Keyword("("),
                 Token::Keyword(")"),
                 [],
                 |_| Expression::Error,
             ))
+            .labelled("list");
+        primitive
+            .or(list)
             .map_with_span(|expr, span| (expr, span))
+            .labelled("expression")
     });
     expr.clone()
         .repeated()
@@ -58,6 +57,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             let last_expr = iter.next().unwrap();
             Program { exprs, last_expr }
         })
+        .labelled("program")
         .then_ignore(end().recover_with(skip_then_retry_until([])))
 }
 
