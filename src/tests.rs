@@ -2,17 +2,22 @@ use crate::*;
 use manifest_dir_macros::*;
 use pretty_assertions::assert_eq;
 use std::ffi::OsStr;
-use std::fs::{read_dir, read_to_string, File};
-use std::io::Write;
+use std::fs::{self, read_dir, File};
+use std::io::{self, Write};
 use std::path::Path;
+fn read_to_string<P: AsRef<Path>>(path: P) -> io::Result<String> {
+    let s = fs::read_to_string(path)?;
+    Ok(s.replace("\r\n", "\n"))
+}
+fn path_to_string(path: &Path) -> String {
+    path.to_str().unwrap().to_string().replace('\\', "/")
+}
 fn assert_eq_or_override(path: &Path, actual: &str) {
     if cfg!(feature = "override-test") {
         let mut file = File::create(path).unwrap();
         file.write_all(actual.as_bytes()).unwrap();
     }
-    let expected = read_to_string(path)
-        .unwrap_or_else(|_| String::new())
-        .replace('\r', "");
+    let expected = read_to_string(path).unwrap_or_else(|_| String::new());
     assert_eq!(&expected, actual)
 }
 #[test]
@@ -45,12 +50,7 @@ fn tokenize_error_works() {
         if path.extension() != Some(OsStr::new("scm")) {
             continue;
         }
-        let path_str = path
-            .strip_prefix(path!("."))
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_owned();
+        let path_str = path_to_string(path.strip_prefix(path!(".")).unwrap());
         let input = read_to_string(&path).unwrap();
         let (_, error) = tokenize(&input, &path_str);
         let content = error.unwrap().to_string();
@@ -67,12 +67,7 @@ fn parse_error_works() {
         if path.extension() != Some(OsStr::new("scm")) {
             continue;
         }
-        let path_str = path
-            .strip_prefix(path!("."))
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_owned();
+        let path_str = path_to_string(path.strip_prefix(path!(".")).unwrap());
         let input = read_to_string(&path).unwrap();
         let (_, error) = parse_recover(&input, &path_str);
         let content = error.unwrap().to_string();
