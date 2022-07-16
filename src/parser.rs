@@ -10,7 +10,7 @@ pub struct Program {
 
 #[derive(Debug)]
 pub enum Expression {
-    List(Vec<Box<Spanned<Expression>>>),
+    List(Vec<Spanned<Expression>>),
     Integer(i64),
     Ident(String),
     Error,
@@ -30,7 +30,6 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             )
         });
         let list = expr
-            .map(Box::new)
             .repeated()
             .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
             .map_err(|e: Simple<Token>| {
