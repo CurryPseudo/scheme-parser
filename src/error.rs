@@ -42,11 +42,16 @@ impl std::fmt::Display for ParseError {
             let report = match error.reason() {
                 chumsky::error::SimpleReason::Unexpected => report
                     .with_message(format!(
-                        "{}, expected {}",
+                        "{}{}, expected {}",
                         if error.found().is_some() {
-                            "Unexpected char in input"
+                            "Unexpected token in input"
                         } else {
                             "Unexpected end of input"
+                        },
+                        if let Some(label) = error.label() {
+                            format!(" while parsing {}", label)
+                        } else {
+                            "".to_string()
                         },
                         if error.expected().len() == 0 {
                             "something else".to_string()
@@ -68,7 +73,7 @@ impl std::fmt::Display for ParseError {
                             fg!(
                                 error
                                     .found()
-                                    .map(|c| format!("char {}", c))
+                                    .map(|c| format!("token {}", c))
                                     .unwrap_or_else(|| "end of file".to_string()),
                                 Color::Red
                             )
@@ -77,8 +82,13 @@ impl std::fmt::Display for ParseError {
                     )),
                 chumsky::error::SimpleReason::Unclosed { span, delimiter } => report
                     .with_message(format!(
-                        "Unclosed delimiter {}",
+                        "Unclosed delimiter {}{}",
                         fg!(delimiter, Color::Yellow),
+                        if let Some(label) = error.label() {
+                            format!(" while parsing {}", label)
+                        } else {
+                            "".to_string()
+                        },
                     ))
                     .with_label(with_color!(
                         Label::new((self.source_path.clone(), span.clone())).with_message(format!(
@@ -101,7 +111,15 @@ impl std::fmt::Display for ParseError {
                         Color::Red
                     )),
                 chumsky::error::SimpleReason::Custom(msg) => report
-                    .with_message(format!("{}", msg,))
+                    .with_message(format!(
+                        "{}{}",
+                        msg,
+                        if let Some(label) = error.label() {
+                            format!(" while parsing {}", label)
+                        } else {
+                            "".to_string()
+                        },
+                    ))
                     .with_label(with_color!(
                         Label::new((self.source_path.clone(), error.span()))
                             .with_message(format!("{}", fg!(msg, Color::Red))),

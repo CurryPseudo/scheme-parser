@@ -54,16 +54,20 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             .labelled("list");
         primitive.or(list).map_with_span(|expr, span| (expr, span))
     });
-    expr.clone().repeated().at_least(1).map(|exprs| {
-        let len = exprs.len();
-        let mut iter = exprs.into_iter();
-        let mut exprs = Vec::new();
-        for _ in 0..len - 1 {
-            exprs.push(iter.next().unwrap());
-        }
-        let last_expr = iter.next().unwrap();
-        Program { exprs, last_expr }
-    })
+    expr.clone()
+        .repeated()
+        .at_least(1)
+        .map(|exprs| {
+            let len = exprs.len();
+            let mut iter = exprs.into_iter();
+            let mut exprs = Vec::new();
+            for _ in 0..len - 1 {
+                exprs.push(iter.next().unwrap());
+            }
+            let last_expr = iter.next().unwrap();
+            Program { exprs, last_expr }
+        })
+        .then_ignore(end().recover_with(skip_then_retry_until([])))
 }
 
 pub fn parse(source: &str, source_path: &str) -> Result<Program, ParseError> {
