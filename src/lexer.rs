@@ -1,6 +1,7 @@
 use chumsky::prelude::*;
-
+mod error;
 use crate::*;
+pub use error::*;
 
 const EXTENDED_IDENTIFIER_CHARS: &str = "!$%&*+-/:<=>?@^_~";
 #[derive(Debug, Clone)]
@@ -48,14 +49,14 @@ pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
 pub fn tokenize(
     source: &str,
     source_path: &str,
-) -> (Option<Vec<Spanned<Token>>>, Option<ParseError>) {
+) -> (Option<Vec<Spanned<Token>>>, Option<TokenizeError>) {
     let (tokens, e) = lexer().parse_recovery(source);
     (
         tokens,
         if e.is_empty() {
             None
         } else {
-            Some(ParseError {
+            Some(TokenizeError {
                 source: source.to_string(),
                 source_path: source_path.to_string(),
                 simple: e,

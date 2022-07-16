@@ -35,8 +35,31 @@ fn parser_works() {
     assert_eq_or_override(Path::new(path!("tests/main.ast")), &content);
 }
 #[test]
-fn errors_works() {
-    let dir = path!("tests/error");
+fn tokenize_error_works() {
+    let dir = path!("tests/tokenize/error");
+    for entry in read_dir(dir).unwrap() {
+        let path = entry.unwrap().path();
+        if path.extension() != Some(OsStr::new("scm")) {
+            continue;
+        }
+        let path_str = path
+            .strip_prefix(path!("."))
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_owned();
+        let input = read_to_string(&path).unwrap();
+        let (result, error) = tokenize(&input, &path_str);
+        assert!(result.is_none());
+        let content = error.unwrap().to_string();
+        let mut error_path = path.clone();
+        error_path.set_extension("err");
+        assert_eq_or_override(&error_path, &content);
+    }
+}
+#[test]
+fn parse_error_works() {
+    let dir = path!("tests/parse/error");
     for entry in read_dir(dir).unwrap() {
         let path = entry.unwrap().path();
         if path.extension() != Some(OsStr::new("scm")) {
