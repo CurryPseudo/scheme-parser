@@ -5,15 +5,15 @@ use std::ffi::OsStr;
 use std::fs::{read_dir, read_to_string, File};
 use std::io::Write;
 use std::path::Path;
-fn assert_eq_or_override(path: &Path, content: &str) {
+fn assert_eq_or_override(path: &Path, actual: &str) {
     if cfg!(feature = "override-test") {
         let mut file = File::create(path).unwrap();
-        file.write_all(content.as_bytes()).unwrap();
+        file.write_all(actual.as_bytes()).unwrap();
     }
-    let actual = read_to_string(path)
+    let expected = read_to_string(path)
         .unwrap_or_else(|_| String::new())
         .replace('\r', "");
-    assert_eq!(content, &actual)
+    assert_eq!(&expected, actual)
 }
 #[test]
 fn lexer_works() {
