@@ -3,9 +3,11 @@ use std::fmt::Debug;
 use ariadne::{sources, Color, Fmt, Label, Report, ReportKind};
 use chumsky::prelude::Simple;
 
+use crate::Token;
+
 #[derive(Debug, Default)]
 pub struct ParseError {
-    pub(crate) simple: Vec<Simple<char>>,
+    pub(crate) simple: Vec<Simple<Token>>,
     pub(crate) source: String,
     pub(crate) source_path: String,
     pub(crate) colorful: bool,

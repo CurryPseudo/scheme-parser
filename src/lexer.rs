@@ -1,15 +1,26 @@
+use std::fmt::Display;
+
 use chumsky::prelude::*;
 mod error;
 use crate::*;
 pub use error::*;
 
 const EXTENDED_IDENTIFIER_CHARS: &str = "!$%&*+-/:<=>?@^_~";
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Token {
     Integer(i64),
     Ident(String),
     Keyword(&'static str),
-    KeywordChar(char),
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::Integer(i) => write!(f, "{}", i),
+            Token::Ident(ident) => write!(f, "{}", ident),
+            Token::Keyword(keyword) => write!(f, "{}", keyword),
+        }
+    }
 }
 
 pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
@@ -39,9 +50,9 @@ pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
         .labelled("comment");
     let token = keyword.or(num).or(ident).labelled("token");
     token
-        .padded()
-        .padded_by(comment.repeated())
         .map_with_span(|token, span| (token, span))
+        .padded_by(comment.repeated().padded())
+        .padded()
         .repeated()
         .then_ignore(end())
 }

@@ -26,6 +26,8 @@ fn main() {
         if let Some(program) = program {
             println!("{:#?}", program);
         }
-        print!("{}", error.with_color(!args.non_colorful));
+        if let Some(error) = error {
+            print!("{}", error.with_color(!args.non_colorful));
+        }
     }
 }

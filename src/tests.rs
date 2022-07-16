@@ -30,8 +30,11 @@ fn lexer_works() {
 fn parser_works() {
     let path = path!("tests/main.scm");
     let input = read_to_string(path).unwrap();
-    let result = parse(&input, path).unwrap_or_else(|e| panic!("{}", e.with_color(true)));
-    let content = format!("{:#?}", result);
+    let (result, error) = parse_recover(&input, path);
+    if let Some(error) = error {
+        panic!("{}", error.with_color(true))
+    }
+    let content = format!("{:#?}", result.unwrap());
     assert_eq_or_override(Path::new(path!("tests/main.ast")), &content);
 }
 #[test]
@@ -49,8 +52,7 @@ fn tokenize_error_works() {
             .unwrap()
             .to_owned();
         let input = read_to_string(&path).unwrap();
-        let (result, error) = tokenize(&input, &path_str);
-        assert!(result.is_none());
+        let (_, error) = tokenize(&input, &path_str);
         let content = error.unwrap().to_string();
         let mut error_path = path.clone();
         error_path.set_extension("err");
@@ -72,8 +74,8 @@ fn parse_error_works() {
             .unwrap()
             .to_owned();
         let input = read_to_string(&path).unwrap();
-        let result = parse(&input, &path_str).unwrap_err();
-        let content = result.to_string();
+        let (_, error) = parse_recover(&input, &path_str);
+        let content = error.unwrap().to_string();
         let mut error_path = path.clone();
         error_path.set_extension("err");
         assert_eq_or_override(&error_path, &content);

@@ -1,4 +1,4 @@
-use chumsky::prelude::*;
+use chumsky::{prelude::*, Stream};
 
 use crate::*;
 
@@ -8,8 +8,6 @@ pub struct Program {
     pub last_expr: Spanned<Expression>,
 }
 
-const EXTENDED_IDENTIFIER_CHARS: &str = "!$%&*+-/:<=>?@^_~";
-
 #[derive(Debug)]
 pub enum Expression {
     List(Vec<Box<Spanned<Expression>>>),
@@ -18,74 +16,70 @@ pub enum Expression {
     Error,
 }
 
-fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
-    let comment = just(";")
-        .then(take_until(text::newline().or(end())))
-        .padded();
+fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
     let expr = recursive(|expr| {
-        let num = just('-')
-            .or_not()
-            .chain::<char, _, _>(text::int(10))
-            .collect::<String>()
-            .map(|n| Expression::Integer(n.parse::<i64>().unwrap()))
-            .padded()
-            .labelled("number");
-        let ident =
-            filter(|c: &char| c.is_ascii_alphanumeric() || EXTENDED_IDENTIFIER_CHARS.contains(*c))
-                .repeated()
-                .at_least(1)
-                .collect()
-                .padded()
-                .map(Expression::Ident)
-                .labelled("ident");
+        let primitive = select! {
+            Token::Integer(v) => Expression::Integer(v),
+            Token::Ident(v) => Expression::Ident(v),
+        }
+        .labelled("primitive");
         let list = expr
             .map(Box::new)
             .repeated()
-            .delimited_by(just('('), just(')'))
+            .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
             .collect::<Vec<_>>()
             .map(Expression::List)
-            .recover_with(nested_delimiters('(', ')', [], |_| Expression::Error))
+            .recover_with(nested_delimiters(
+                Token::Keyword("("),
+                Token::Keyword(")"),
+                [],
+                |_| Expression::Error,
+            ))
             .labelled("list");
-        num.or(ident)
-            .or(list)
-            .map_with_span(|expr, span| (expr, span))
+        primitive.or(list).map_with_span(|expr, span| (expr, span))
+    });
+    expr.clone().repeated().at_least(1).map(|exprs| {
+        let len = exprs.len();
+        let mut iter = exprs.into_iter();
+        let mut exprs = Vec::new();
+        for _ in 0..len - 1 {
+            exprs.push(iter.next().unwrap());
+        }
+        let last_expr = iter.next().unwrap();
+        Program { exprs, last_expr }
     })
-    .padded_by(comment.repeated())
-    .padded()
-    .labelled("expression");
-    expr.clone()
-        .repeated()
-        .at_least(1)
-        .map(|exprs| {
-            let len = exprs.len();
-            let mut iter = exprs.into_iter();
-            let mut exprs = Vec::new();
-            for _ in 0..len - 1 {
-                exprs.push(iter.next().unwrap());
-            }
-            let last_expr = iter.next().unwrap();
-            Program { exprs, last_expr }
-        })
-        .then_ignore(end().recover_with(skip_then_retry_until([])))
 }
 
 pub fn parse(source: &str, source_path: &str) -> Result<Program, ParseError> {
-    parser().parse(source).map_err(|e| ParseError {
-        source: source.to_string(),
-        source_path: source_path.to_string(),
-        simple: e,
-        ..Default::default()
-    })
-}
-pub fn parse_recover(source: &str, source_path: &str) -> (Option<Program>, ParseError) {
-    let (program, error) = parser().parse_recovery(source);
-    (
-        program,
-        ParseError {
+    let (tokens, _) = tokenize(source, source_path);
+    let tokens = tokens.unwrap();
+    let len = source.len();
+    parser()
+        .parse(Stream::from_iter(len..len + 1, tokens.into_iter()))
+        .map_err(|e| ParseError {
             source: source.to_string(),
             source_path: source_path.to_string(),
-            simple: error,
+            simple: e,
             ..Default::default()
+        })
+}
+pub fn parse_recover(source: &str, source_path: &str) -> (Option<Program>, Option<ParseError>) {
+    let (tokens, _) = tokenize(source, source_path);
+    let tokens = tokens.unwrap();
+    let len = source.len();
+    let (program, error) =
+        parser().parse_recovery(Stream::from_iter(len..len + 1, tokens.into_iter()));
+    (
+        program,
+        if error.is_empty() {
+            None
+        } else {
+            Some(ParseError {
+                source: source.to_string(),
+                source_path: source_path.to_string(),
+                simple: error,
+                ..Default::default()
+            })
         },
     )
 }

@@ -2,15 +2,15 @@ Error: Unclosed delimiter (, parsing list
    ╭─[tests/parse/error/list_unclosed.scm:1:6]
    │
  1 │ (3132
-   · ┬    │ 
-   · ╰────── Unclosed delimiter (
-   ·      │ 
-   ·      ╰─ Must be closed before this end of file
+   · ┬    ┬  
+   · ╰─────── Unclosed delimiter (
+   ·      │  
+   ·      ╰── Must be closed before this end of file
 ───╯
-Error: Unexpected end of input, expected (, ), -, 0, parsing list
+Error: Unexpected end of input, expected (, ), parsing list
    ╭─[tests/parse/error/list_unclosed.scm:1:6]
    │
  1 │ (3132
-   ·      │ 
-   ·      ╰─ Unexpected end of file
+   ·      ┬  
+   ·      ╰── Unexpected end of file
 ───╯
