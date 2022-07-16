@@ -1,6 +1,6 @@
 use chumsky::prelude::*;
 
-use crate::ParseError;
+use crate::*;
 
 #[derive(Debug)]
 pub struct Program {
@@ -9,9 +9,6 @@ pub struct Program {
 }
 
 const EXTENDED_IDENTIFIER_CHARS: &str = "!$%&*+-/:<=>?@^_~";
-
-pub type Span = std::ops::Range<usize>;
-pub type Spanned<T> = (T, Span);
 
 #[derive(Debug)]
 pub enum Expression {
@@ -94,53 +91,4 @@ pub fn parse_recover(source: &str, source_path: &str) -> (Option<Program>, Parse
 }
 
 #[cfg(test)]
-mod tests {
-
-    use super::*;
-    use manifest_dir_macros::*;
-    use pretty_assertions::assert_eq;
-    use std::ffi::OsStr;
-    use std::fs::{read_dir, read_to_string, File};
-    use std::io::Write;
-    use std::path::Path;
-    fn assert_eq_or_override(path: &Path, content: &str) {
-        if cfg!(feature = "override-test") {
-            let mut file = File::create(path).unwrap();
-            file.write_all(content.as_bytes()).unwrap();
-        }
-        let actual = read_to_string(path)
-            .unwrap_or_else(|_| String::new())
-            .replace('\r', "");
-        assert_eq!(content, &actual)
-    }
-    #[test]
-    fn parser_works() {
-        let path = path!("tests/parser.scm");
-        let input = read_to_string(path).unwrap();
-        let result = parse(&input, path).unwrap_or_else(|e| panic!("{}", e.with_color(true)));
-        let content = format!("{:#?}", result);
-        assert_eq_or_override(Path::new(path!("tests/parser.ast")), &content);
-    }
-    #[test]
-    fn errors_works() {
-        let dir = path!("tests/error");
-        for entry in read_dir(dir).unwrap() {
-            let path = entry.unwrap().path();
-            if path.extension() != Some(OsStr::new("scm")) {
-                continue;
-            }
-            let path_str = path
-                .strip_prefix(path!("."))
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .to_owned();
-            let input = read_to_string(&path).unwrap();
-            let result = parse(&input, &path_str).unwrap_err();
-            let content = result.to_string();
-            let mut error_path = path.clone();
-            error_path.set_extension("err");
-            assert_eq_or_override(&error_path, &content);
-        }
-    }
-}
+mod tests {}

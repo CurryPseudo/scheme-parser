@@ -40,7 +40,7 @@ impl std::fmt::Display for ParseError {
             let report = match error.reason() {
                 chumsky::error::SimpleReason::Unexpected => report
                     .with_message(format!(
-                        "{}, expected {}",
+                        "{}, expected {}{}",
                         if error.found().is_some() {
                             "Unexpected char in input"
                         } else {
@@ -59,6 +59,11 @@ impl std::fmt::Display for ParseError {
                             expected.sort();
                             expected.join(", ")
                         },
+                        if let Some(label) = error.label() {
+                            format!(", parsing {}", label)
+                        } else {
+                            "".to_string()
+                        }
                     ))
                     .with_label(with_color!(
                         Label::new((self.source_path.clone(), error.span())).with_message(format!(
@@ -75,8 +80,13 @@ impl std::fmt::Display for ParseError {
                     )),
                 chumsky::error::SimpleReason::Unclosed { span, delimiter } => report
                     .with_message(format!(
-                        "Unclosed delimiter {}",
+                        "Unclosed delimiter {}{}",
                         fg!(delimiter, Color::Yellow),
+                        if let Some(label) = error.label() {
+                            format!(", parsing {}", label)
+                        } else {
+                            "".to_string()
+                        }
                     ))
                     .with_label(with_color!(
                         Label::new((self.source_path.clone(), span.clone())).with_message(format!(
@@ -98,13 +108,21 @@ impl std::fmt::Display for ParseError {
                         )),
                         Color::Red
                     )),
-                chumsky::error::SimpleReason::Custom(msg) => {
-                    report.with_message(msg).with_label(with_color!(
+                chumsky::error::SimpleReason::Custom(msg) => report
+                    .with_message(format!(
+                        "{}{}",
+                        msg,
+                        if let Some(label) = error.label() {
+                            format!(", parsing {}", label)
+                        } else {
+                            "".to_string()
+                        }
+                    ))
+                    .with_label(with_color!(
                         Label::new((self.source_path.clone(), error.span()))
                             .with_message(format!("{}", fg!(msg, Color::Red))),
                         Color::Red
-                    ))
-                }
+                    )),
             };
             let mut content = Vec::new();
             if report

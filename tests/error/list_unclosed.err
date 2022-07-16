@@ -1,4 +1,4 @@
-Error: Unclosed delimiter (
+Error: Unclosed delimiter (, parsing list
    ╭─[tests\error\list_unclosed.scm:1:6]
    │
  1 │ (3132
@@ -7,7 +7,7 @@ Error: Unclosed delimiter (
    ·      │ 
    ·      ╰─ Must be closed before this end of file
 ───╯
-Error: Unexpected end of input, expected (, ), -, 0
+Error: Unexpected end of input, expected (, ), -, 0, parsing list
    ╭─[tests\error\list_unclosed.scm:1:6]
    │
  1 │ (3132
