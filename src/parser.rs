@@ -22,11 +22,27 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             Token::Integer(v) => Expression::Integer(v),
             Token::Ident(v) => Expression::Ident(v),
         }
-        .labelled("primitive");
+        .map_err(|e: Simple<Token>| {
+            Simple::expected_input_found(
+                e.span(),
+                Some(Some(Token::Keyword("<primitive>"))),
+                e.found().cloned(),
+            )
+        });
         let list = expr
             .map(Box::new)
             .repeated()
             .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
+            .map_err(|e: Simple<Token>| {
+                Simple::expected_input_found(
+                    e.span(),
+                    vec![
+                        Some(Token::Keyword(")")),
+                        Some(Token::Keyword("<expression>")),
+                    ],
+                    e.found().cloned(),
+                )
+            })
             .collect::<Vec<_>>()
             .map(Expression::List)
             .recover_with(nested_delimiters(
