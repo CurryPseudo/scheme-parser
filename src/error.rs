@@ -1,19 +1,21 @@
-use std::fmt::Debug;
+use std::{
+    fmt::{Debug, Display},
+    hash::Hash,
+};
 
 use ariadne::{sources, Color, Fmt, Label, Report, ReportKind};
 use chumsky::prelude::Simple;
 
-use crate::Token;
-
 #[derive(Debug, Default)]
-pub struct ParseError {
-    pub(crate) simple: Vec<Simple<Token>>,
+pub struct ParseError<T: Hash> {
+    pub(crate) simple: Vec<Simple<T>>,
     pub(crate) source: String,
     pub(crate) source_path: String,
     pub(crate) colorful: bool,
+    pub(crate) type_name: &'static str,
 }
 
-impl std::fmt::Display for ParseError {
+impl<T: Hash + Eq + Display> std::fmt::Display for ParseError<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         macro_rules! with_color {
             ($a: expr, $b: expr) => {
@@ -44,9 +46,9 @@ impl std::fmt::Display for ParseError {
                     .with_message(format!(
                         "{}{}, expected {}",
                         if error.found().is_some() {
-                            "Unexpected token in input"
+                            format!("Unexpected {} in input", self.type_name)
                         } else {
-                            "Unexpected end of input"
+                            "Unexpected end of input".to_string()
                         },
                         if let Some(label) = error.label() {
                             format!(" while parsing {}", label)
@@ -73,7 +75,7 @@ impl std::fmt::Display for ParseError {
                             fg!(
                                 error
                                     .found()
-                                    .map(|c| format!("token {}", c))
+                                    .map(|c| format!("{} {}", self.type_name, c))
                                     .unwrap_or_else(|| "end of file".to_string()),
                                 Color::Red
                             )
@@ -144,7 +146,7 @@ impl std::fmt::Display for ParseError {
     }
 }
 
-impl ParseError {
+impl<T: Hash> ParseError<T> {
     /// Should display with color or not, default: false
     pub fn with_color(self, colorful: bool) -> Self {
         ParseError { colorful, ..self }

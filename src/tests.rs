@@ -35,7 +35,7 @@ fn lexer_works() {
 fn parser_works() {
     let path = path!("tests/main.scm");
     let input = read_to_string(path).unwrap();
-    let (result, error) = parse_recover(&input, path);
+    let (result, error) = parse(&input, path);
     if let Some(error) = error {
         panic!("{}", error.with_color(true))
     }
@@ -69,7 +69,7 @@ fn parse_error_works() {
         }
         let path_str = path_to_string(path.strip_prefix(path!(".")).unwrap());
         let input = read_to_string(&path).unwrap();
-        let (_, error) = parse_recover(&input, &path_str);
+        let (_, error) = parse(&input, &path_str);
         let content = error.unwrap().to_string();
         let mut error_path = path.clone();
         error_path.set_extension("err");

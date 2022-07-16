@@ -69,20 +69,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         .then_ignore(end().recover_with(skip_then_retry_until([])))
 }
 
-pub fn parse(source: &str, source_path: &str) -> Result<Program, ParseError> {
-    let (tokens, _) = tokenize(source, source_path);
-    let tokens = tokens.unwrap();
-    let len = source.len();
-    parser()
-        .parse(Stream::from_iter(len..len + 1, tokens.into_iter()))
-        .map_err(|e| ParseError {
-            source: source.to_string(),
-            source_path: source_path.to_string(),
-            simple: e,
-            ..Default::default()
-        })
-}
-pub fn parse_recover(source: &str, source_path: &str) -> (Option<Program>, Option<ParseError>) {
+pub fn parse(source: &str, source_path: &str) -> (Option<Program>, Option<ParseError<Token>>) {
     let (tokens, _) = tokenize(source, source_path);
     let tokens = tokens.unwrap();
     let len = source.len();
@@ -97,7 +84,8 @@ pub fn parse_recover(source: &str, source_path: &str) -> (Option<Program>, Optio
                 source: source.to_string(),
                 source_path: source_path.to_string(),
                 simple: error,
-                ..Default::default()
+                type_name: "token",
+                colorful: false,
             })
         },
     )

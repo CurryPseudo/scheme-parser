@@ -22,7 +22,7 @@ fn main() {
             print!("{}", error.with_color(!args.non_colorful));
         }
     } else {
-        let (program, error) = scheme_parser::parse_recover(&file_content, &args.file_name);
+        let (program, error) = scheme_parser::parse(&file_content, &args.file_name);
         if let Some(program) = program {
             println!("{:#?}", program);
         }
