@@ -66,7 +66,7 @@ impl std::fmt::Display for ParseError {
                             fg!(
                                 error
                                     .found()
-                                    .map(|c| format!("token {}", c))
+                                    .map(|c| format!("char {}", c))
                                     .unwrap_or_else(|| "end of file".to_string()),
                                 Color::Red
                             )

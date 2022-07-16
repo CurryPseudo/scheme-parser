@@ -1,4 +1,4 @@
-use chumsky::{prelude::*, recovery::nested_delimiters};
+use chumsky::prelude::*;
 
 use crate::ParseError;
 
@@ -79,6 +79,18 @@ pub fn parse(source: &str, source_path: &str) -> Result<Program, ParseError> {
         simple: e,
         ..Default::default()
     })
+}
+pub fn parse_recover(source: &str, source_path: &str) -> (Option<Program>, ParseError) {
+    let (program, error) = parser().parse_recovery(source);
+    (
+        program,
+        ParseError {
+            source: source.to_string(),
+            source_path: source_path.to_string(),
+            simple: error,
+            ..Default::default()
+        },
+    )
 }
 
 #[cfg(test)]
