@@ -1,4 +1,4 @@
-Error: Unclosed delimiter ( while parsing list
+Error: Unclosed delimiter (
    ╭─[tests/parse/error/list_unclosed_right.scm:1:6]
    │
  1 │ (3132
@@ -7,7 +7,7 @@ Error: Unclosed delimiter ( while parsing list
    ·      │  
    ·      ╰── Must be closed before this end of file
 ───╯
-Error: Unexpected end of input while parsing list, expected ), <expression>
+Error: Unexpected end of input, expected <expression>
    ╭─[tests/parse/error/list_unclosed_right.scm:1:6]
    │
  1 │ (3132
