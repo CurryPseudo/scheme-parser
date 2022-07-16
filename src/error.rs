@@ -1,5 +1,5 @@
 use std::{
-    fmt::{Debug, Display},
+    fmt::{Debug, Display, Write},
     hash::Hash,
 };
 
@@ -11,8 +11,9 @@ pub struct ParseError<T: Hash> {
     pub(crate) simple: Vec<Simple<T>>,
     pub(crate) source: String,
     pub(crate) source_path: String,
-    pub(crate) colorful: bool,
     pub(crate) type_name: &'static str,
+    pub(crate) colorful: bool,
+    pub(crate) display_every_expected: bool,
 }
 
 impl<T: Hash + Eq + Display> std::fmt::Display for ParseError<T> {
@@ -43,21 +44,18 @@ impl<T: Hash + Eq + Display> std::fmt::Display for ParseError<T> {
             );
             let report = match error.reason() {
                 chumsky::error::SimpleReason::Unexpected => report
-                    .with_message(format!(
-                        "{}{}, expected {}",
+                    .with_message({
+                        let mut msg = String::new();
                         if error.found().is_some() {
-                            format!("Unexpected {} in input", self.type_name)
+                            write!(msg, "Unexpected {} in input", self.type_name).unwrap();
                         } else {
-                            "Unexpected end of input".to_string()
-                        },
+                            write!(msg, "Unexpected end of input").unwrap();
+                        }
                         if let Some(label) = error.label() {
-                            format!(" while parsing {}", label)
-                        } else {
-                            "".to_string()
-                        },
-                        if error.expected().len() == 0 {
-                            "something else".to_string()
-                        } else {
+                            write!(msg, " while parsing {}", label).unwrap();
+                        }
+                        if self.display_every_expected && error.expected().len() > 0 {
+                            write!(msg, ", expected ").unwrap();
                             let mut expected = error
                                 .expected()
                                 .map(|expected| match expected {
@@ -66,9 +64,36 @@ impl<T: Hash + Eq + Display> std::fmt::Display for ParseError<T> {
                                 })
                                 .collect::<Vec<_>>();
                             expected.sort();
-                            expected.join(", ")
+                            write!(msg, "{}", expected.join(", ")).unwrap();
                         }
-                    ))
+                        msg
+                    })
+                    //.with_message(format!(
+                    //    "{}{}, expected {}",
+                    //    if error.found().is_some() {
+                    //        format!("Unexpected {} in input", self.type_name)
+                    //    } else {
+                    //        "Unexpected end of input".to_string()
+                    //    },
+                    //    if let Some(label) = error.label() {
+                    //        format!(" while parsing {}", label)
+                    //    } else {
+                    //        "".to_string()
+                    //    },
+                    //    if error.expected().len() == 0 {
+                    //        "something else".to_string()
+                    //    } else {
+                    //        let mut expected = error
+                    //            .expected()
+                    //            .map(|expected| match expected {
+                    //                Some(expected) => expected.to_string(),
+                    //                None => "end of input".to_string(),
+                    //            })
+                    //            .collect::<Vec<_>>();
+                    //        expected.sort();
+                    //        expected.join(", ")
+                    //    }
+                    //))
                     .with_label(with_color!(
                         Label::new((self.source_path.clone(), error.span())).with_message(format!(
                             "Unexpected {}",

@@ -1,4 +1,4 @@
-Error: Unexpected char in input, expected (, ), -, 0, ;, end of input
+Error: Unexpected char in input
    ╭─[tests/tokenize/error/tokenize.scm:1:1]
    │
  1 │ ```

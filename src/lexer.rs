@@ -72,6 +72,7 @@ pub fn tokenize(
                 simple: e,
                 type_name: "char",
                 colorful: false,
+                display_every_expected: false,
             })
         },
     )

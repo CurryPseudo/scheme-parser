@@ -86,6 +86,7 @@ pub fn parse(source: &str, source_path: &str) -> (Option<Program>, Option<ParseE
                 simple: error,
                 type_name: "token",
                 colorful: false,
+                display_every_expected: true,
             })
         },
     )
