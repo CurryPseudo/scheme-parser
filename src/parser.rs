@@ -1,4 +1,4 @@
-use chumsky::prelude::*;
+use chumsky::{prelude::*, recovery::nested_delimiters};
 
 #[derive(Debug)]
 pub struct Program {
@@ -16,6 +16,7 @@ pub enum Expression {
     List(Vec<Box<Spanned<Expression>>>),
     Integer(i64),
     Ident(String),
+    Error,
 }
 
 pub fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
@@ -44,6 +45,7 @@ pub fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
             .delimited_by(just('('), just(')'))
             .collect::<Vec<_>>()
             .map(Expression::List)
+            .recover_with(nested_delimiters('(', ')', [], |_| Expression::Error))
             .labelled("list");
         num.or(ident)
             .or(list)
@@ -71,13 +73,14 @@ pub fn parser() -> impl Parser<char, Program, Error = Simple<char>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ariadne::{Color, Label, Report, ReportKind, Source};
+    use ariadne::{sources, Color, Fmt, Label, Report, ReportKind};
     use manifest_dir_macros::*;
     use pretty_assertions::assert_eq;
     use std::ffi::OsStr;
     use std::fs::{read_dir, read_to_string, File};
     use std::io::Write;
     use std::path::Path;
+    use strip_ansi_escapes::strip;
     fn assert_eq_or_override(path: &Path, content: &str) {
         if cfg!(feature = "override-test") {
             let mut file = File::create(path).unwrap();
@@ -110,11 +113,17 @@ mod tests {
             if path.extension() != Some(OsStr::new("scm")) {
                 continue;
             }
+            let path_str = path
+                .strip_prefix(path!("."))
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_owned();
             let input = read_to_string(&path).unwrap();
             let result = parser().parse(input.as_str()).unwrap_err();
             let mut content = Vec::new();
             for error in result {
-                let report = Report::<Span>::build::<()>(ReportKind::Error, (), error.span().start);
+                let report = Report::build(ReportKind::Error, path_str.clone(), error.span().start);
                 let report = match error.reason() {
                     chumsky::error::SimpleReason::Unexpected => report
                         .with_message(format!(
@@ -127,35 +136,71 @@ mod tests {
                             if error.expected().len() == 0 {
                                 "something else".to_string()
                             } else {
-                                error
+                                let mut expected = error
                                     .expected()
                                     .map(|expected| match expected {
                                         Some(expected) => expected.to_string(),
                                         None => "end of input".to_string(),
                                     })
-                                    .collect::<Vec<_>>()
-                                    .join(", ")
-                            }
-                        ))
-                        .with_label(Label::new(error.span()).with_message(
-                            if let Some(c) = error.found() {
-                                format!("Unexpected char {}", c)
-                            } else {
-                                "Unexpected end of input".to_string()
+                                    .collect::<Vec<_>>();
+                                expected.sort();
+                                expected.join(", ")
                             },
-                        )),
-                    chumsky::error::SimpleReason::Unclosed { span, delimiter } => todo!(),
-                    chumsky::error::SimpleReason::Custom(_) => todo!(),
+                        ))
+                        .with_label(
+                            Label::new((path_str.clone(), error.span()))
+                                .with_message(format!(
+                                    "Unexpected {}",
+                                    error
+                                        .found()
+                                        .map(|c| format!("token {}", c))
+                                        .unwrap_or_else(|| "end of file".to_string())
+                                        .fg(Color::Red)
+                                ))
+                                .with_color(Color::Red),
+                        ),
+                    chumsky::error::SimpleReason::Unclosed { span, delimiter } => report
+                        .with_message(format!(
+                            "Unclosed delimiter {}",
+                            delimiter.fg(Color::Yellow),
+                        ))
+                        .with_label(
+                            Label::new((path_str.clone(), span.clone()))
+                                .with_message(format!(
+                                    "Unclosed delimiter {}",
+                                    delimiter.fg(Color::Yellow)
+                                ))
+                                .with_color(Color::Yellow),
+                        )
+                        .with_label(
+                            Label::new((path_str.clone(), error.span()))
+                                .with_message(format!(
+                                    "Must be closed before this {}",
+                                    error
+                                        .found()
+                                        .map(|c| c.to_string())
+                                        .unwrap_or_else(|| "end of file".to_string())
+                                        .fg(Color::Red)
+                                ))
+                                .with_color(Color::Red),
+                        ),
+                    chumsky::error::SimpleReason::Custom(msg) => {
+                        report.with_message(msg).with_label(
+                            Label::new((path_str.clone(), error.span()))
+                                .with_message(format!("{}", msg.fg(Color::Red)))
+                                .with_color(Color::Red),
+                        )
+                    }
                 };
-                //report.finish().print(Source::from(&input)).unwrap();
                 report
-                    .with_config(ariadne::Config::default().with_color(false))
                     .finish()
-                    .write(Source::from(&input), &mut content)
+                    .write(sources(vec![(path_str.clone(), &input)]), &mut content)
                     .unwrap();
             }
+            // strip out colors
+            let content = strip(content).unwrap();
             let content = String::from_utf8(content).unwrap();
-            let mut error_path = path;
+            let mut error_path = path.clone();
             error_path.set_extension("err");
             assert_eq_or_override(&error_path, &content);
         }

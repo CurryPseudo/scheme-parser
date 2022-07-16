@@ -1,7 +1,16 @@
-Error: Unexpected end of input, expected -, ), (, 0
-   ╭─[<unknown>:1:6]
+Error: Unclosed delimiter (
+   ╭─[tests\error\num.scm:1:6]
+   │
+ 1 │ (3132
+   · ┬    │ 
+   · ╰────── Unclosed delimiter (
+   ·      │ 
+   ·      ╰─ Must be closed before this end of file
+───╯
+Error: Unexpected end of input, expected (, ), -, 0
+   ╭─[tests\error\num.scm:1:6]
    │
  1 │ (3132
    ·      │ 
-   ·      ╰─ Unexpected end of input
+   ·      ╰─ Unexpected end of file
 ───╯
