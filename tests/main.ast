@@ -1,4 +1,4 @@
-Program {
+ProcedureBody {
     defs: [
         Definition(
             "a",
@@ -22,7 +22,7 @@ Program {
             15..20,
         ),
         (
-            List(
+            ProceduralCall(
                 [
                     (
                         Primitive(
@@ -49,7 +49,7 @@ Program {
                         34..38,
                     ),
                     (
-                        List(
+                        ProceduralCall(
                             [
                                 (
                                     Primitive(
@@ -84,7 +84,7 @@ Program {
             59..60,
         ),
         (
-            List(
+            ProceduralCall(
                 [
                     (
                         Primitive(
@@ -116,7 +116,7 @@ Program {
         ),
     ],
     last_expr: (
-        List(
+        ProceduralCall(
             [
                 (
                     Primitive(

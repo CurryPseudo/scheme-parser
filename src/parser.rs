@@ -4,18 +4,20 @@ use derive_more::From;
 use crate::*;
 
 #[derive(Debug)]
-pub struct Program {
+pub struct ProcedureBody {
     pub defs: Vec<Definition>,
     pub exprs: Vec<Spanned<Expression>>,
     pub last_expr: Spanned<Expression>,
 }
+
+pub type Program = ProcedureBody;
 
 #[derive(Debug)]
 pub struct Definition(pub String, pub Spanned<Expression>);
 
 #[derive(Debug, From)]
 pub enum Expression {
-    List(Vec<Spanned<Expression>>),
+    ProceduralCall(Vec<Spanned<Expression>>),
     Primitive(Primitive),
     Error,
 }
@@ -70,7 +72,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             .repeated()
             .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
             .collect::<Vec<_>>()
-            .map(Expression::List)
+            .map(Expression::ProceduralCall)
             .labelled("list");
         map_err_category!(
             "<expression>",

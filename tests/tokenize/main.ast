@@ -1,4 +1,4 @@
-Program {
+ProcedureBody {
     defs: [],
     exprs: [
         (
