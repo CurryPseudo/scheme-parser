@@ -6,6 +6,7 @@ use std::ffi::OsStr;
 use std::fs::{self, read_dir, remove_file, File};
 use std::io::{self, Write};
 use std::path::Path;
+use walkdir::WalkDir;
 fn read_to_string<P: AsRef<Path>>(path: P) -> io::Result<String> {
     let s = fs::read_to_string(path)?;
     Ok(s.replace("\r\n", "\n"))
@@ -64,8 +65,8 @@ fn assert_non_exist(path: &Path, regression_error: &mut RegressionError) {
 fn regression() {
     let dir = path!("tests/");
     let mut regression_errors = Default::default();
-    for entry in read_dir(dir).unwrap() {
-        let path = entry.unwrap().path();
+    for entry in WalkDir::new(dir) {
+        let path = entry.unwrap().path().to_owned();
         if path.extension() != Some(OsStr::new("scm")) {
             continue;
         }

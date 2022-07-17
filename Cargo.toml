@@ -13,6 +13,7 @@ chumsky = "0.8.0"
 backtrace = "0.3.66"
 manifest-dir-macros = "0.1.16"
 pretty_assertions = "1.2.1"
+walkdir = "2.3.2"
 
 [features]
 override-test = []
