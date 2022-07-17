@@ -1,4 +1,5 @@
 Program {
+    defs: [],
     exprs: [],
     last_expr: (
         Integer(

@@ -4,9 +4,13 @@ use crate::*;
 
 #[derive(Debug)]
 pub struct Program {
+    pub defs: Vec<Definition>,
     pub exprs: Vec<Spanned<Expression>>,
     pub last_expr: Spanned<Expression>,
 }
+
+#[derive(Debug)]
+pub struct Definition(pub String, pub Spanned<Expression>);
 
 #[derive(Debug)]
 pub enum Expression {
@@ -17,13 +21,21 @@ pub enum Expression {
 }
 
 fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
+    let ident = filter_map(|span, token| match token {
+        Token::Ident(v) => Ok(v),
+        other => Err(Simple::expected_input_found(
+            span,
+            Some(Some(Token::Keyword("<identifier>"))),
+            Some(other),
+        )),
+    });
     let expr = recursive(|expr| {
-        let primitive = filter_map(|span, token| match token {
+        let ident = ident.map(Expression::Ident);
+        let integer = filter_map(|span, token| match token {
             Token::Integer(v) => Ok(Expression::Integer(v)),
-            Token::Ident(v) => Ok(Expression::Ident(v)),
             other => Err(Simple::expected_input_found(
                 span,
-                Some(Some(Token::Keyword("<primitive>"))),
+                Some(Some(Token::Keyword("<integer>"))),
                 Some(other),
             )),
         });
@@ -39,15 +51,39 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                 |_| Expression::Error,
             ))
             .labelled("list");
-        primitive
+        integer
+            .or(ident)
             .or(list)
             .map_with_span(|expr, span| (expr, span))
             .labelled("expression")
+            .map_err(|e| {
+                if let chumsky::error::SimpleReason::Unexpected = e.reason() {
+                    let r = Simple::expected_input_found(
+                        e.span(),
+                        Some(Some(Token::Keyword("<expression>"))),
+                        e.found().cloned(),
+                    );
+                    if let Some(label) = e.label() {
+                        r.with_label(label)
+                    } else {
+                        r
+                    }
+                } else {
+                    e
+                }
+            })
     });
-    expr.clone()
-        .repeated()
-        .at_least(1)
-        .map(|exprs| {
+    let def = ident
+        .then(expr.clone())
+        .delimited_by(
+            just(vec![Token::Keyword("("), Token::Keyword("define")]),
+            just(Token::Keyword(")")),
+        )
+        .map(|(ident, expr)| Definition(ident, expr))
+        .labelled("definition");
+    def.repeated()
+        .then(expr.repeated().at_least(1))
+        .map(|(defs, exprs)| {
             let len = exprs.len();
             let mut iter = exprs.into_iter();
             let mut exprs = Vec::new();
@@ -55,7 +91,11 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                 exprs.push(iter.next().unwrap());
             }
             let last_expr = iter.next().unwrap();
-            Program { exprs, last_expr }
+            Program {
+                defs,
+                exprs,
+                last_expr,
+            }
         })
         .labelled("program")
         .then_ignore(end().recover_with(skip_then_retry_until([])))

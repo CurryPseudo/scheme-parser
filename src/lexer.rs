@@ -23,9 +23,14 @@ impl Display for Token {
 }
 
 pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
-    macro_rules! keyword {
+    macro_rules! char {
         ($s: expr) => {
             just($s).map(|_| Token::Keyword($s)).labelled($s)
+        };
+    }
+    macro_rules! keyword {
+        ($s: expr) => {
+            text::keyword($s).map(|_| Token::Keyword($s)).labelled($s)
         };
     }
 
@@ -42,7 +47,7 @@ pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
             .collect()
             .map(Token::Ident)
             .labelled("ident");
-    let keyword = keyword!("(").or(keyword!(")"));
+    let keyword = char!("(").or(char!(")")).or(keyword!("define"));
     let comment = just(';')
         .then(take_until(text::newline().or(end())))
         .ignored()
