@@ -78,17 +78,17 @@ fn regression() {
             let mut token_path = path.clone();
             token_path.set_extension("token");
             let (result, error) = tokenize(&input, &path_str);
+            if let (Some(result), None) = (result, &error) {
+                let content = format!("{:#?}", result);
+                assert_eq_or_override(&token_path, &content, &mut regression_errors);
+            } else {
+                assert_non_exist(&token_path, &mut regression_errors);
+            }
             if let Some(error) = error {
                 let content = error.to_string();
                 assert_eq_or_override(&error_path, &content, &mut regression_errors);
             } else {
                 assert_non_exist(&error_path, &mut regression_errors);
-            }
-            if let Some(result) = result {
-                let content = format!("{:#?}", result);
-                assert_eq_or_override(&token_path, &content, &mut regression_errors);
-            } else {
-                assert_non_exist(&token_path, &mut regression_errors);
             }
         }
         {
@@ -97,17 +97,17 @@ fn regression() {
             let mut ast_path = path.clone();
             ast_path.set_extension("ast");
             let (result, error) = parse(&input, &path_str);
+            if let (Some(result), None) = (result, &error) {
+                let content = format!("{:#?}", result);
+                assert_eq_or_override(&ast_path, &content, &mut regression_errors);
+            } else {
+                assert_non_exist(&ast_path, &mut regression_errors);
+            }
             if let Some(error) = error {
                 let content = error.to_string();
                 assert_eq_or_override(&error_path, &content, &mut regression_errors);
             } else {
                 assert_non_exist(&error_path, &mut regression_errors);
-            }
-            if let Some(result) = result {
-                let content = format!("{:#?}", result);
-                assert_eq_or_override(&ast_path, &content, &mut regression_errors);
-            } else {
-                assert_non_exist(&ast_path, &mut regression_errors);
             }
         }
     }
