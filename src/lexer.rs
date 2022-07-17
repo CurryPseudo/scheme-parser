@@ -8,6 +8,7 @@ const EXTENDED_IDENTIFIER_CHARS: &str = "!$%&*+-/:<=>?@^_~";
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Token {
     Integer(i64),
+    Bool(bool),
     Ident(String),
     Keyword(&'static str),
 }
@@ -18,6 +19,13 @@ impl Display for Token {
             Token::Integer(i) => write!(f, "{}", i),
             Token::Ident(ident) => write!(f, "{}", ident),
             Token::Keyword(keyword) => write!(f, "{}", keyword),
+            Token::Bool(b) => {
+                if *b {
+                    write!(f, "#t")
+                } else {
+                    write!(f, "#f")
+                }
+            }
         }
     }
 }
@@ -34,6 +42,11 @@ pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
         };
     }
 
+    let keyword = char!("(").or(char!(")")).or(keyword!("define"));
+    let boolean = choice((
+        just("#t").to(Token::Bool(true)),
+        just("#f").to(Token::Bool(false)),
+    ));
     let num = just('-')
         .or_not()
         .chain::<char, _, _>(text::int(10))
@@ -47,12 +60,11 @@ pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
             .collect()
             .map(Token::Ident)
             .labelled("ident");
-    let keyword = char!("(").or(char!(")")).or(keyword!("define"));
     let comment = just(';')
         .then(take_until(text::newline().or(end())))
         .ignored()
         .labelled("comment");
-    let token = keyword.or(num).or(ident).labelled("token");
+    let token = keyword.or(boolean).or(num).or(ident).labelled("token");
     token
         .map_with_span(|token, span| (token, span))
         .padded_by(comment.repeated().padded())

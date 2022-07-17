@@ -1,0 +1,29 @@
+Program {
+    defs: [],
+    exprs: [
+        (
+            Ident(
+                "asdf",
+            ),
+            0..4,
+        ),
+        (
+            Integer(
+                12345,
+            ),
+            5..10,
+        ),
+        (
+            Bool(
+                true,
+            ),
+            11..13,
+        ),
+    ],
+    last_expr: (
+        Bool(
+            false,
+        ),
+        14..16,
+    ),
+}

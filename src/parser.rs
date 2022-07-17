@@ -16,6 +16,7 @@ pub struct Definition(pub String, pub Spanned<Expression>);
 pub enum Expression {
     List(Vec<Spanned<Expression>>),
     Integer(i64),
+    Bool(bool),
     Ident(String),
     Error,
 }
@@ -61,9 +62,12 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
 
     let expr = recursive(|expr| {
         let ident = ident.map(Expression::Ident);
-        let integer = select! {
-            "<integer>",
-            { Token::Integer(v) => Expression::Integer(v) }
+        let primitive = select! {
+            "<primitive>",
+            {
+                Token::Integer(v) => Expression::Integer(v),
+                Token::Bool(v) => Expression::Bool(v),
+            }
         };
         let list = expr
             .repeated()
@@ -73,7 +77,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             .labelled("list");
         map_err_category!(
             "<expression>",
-            integer
+            primitive
                 .or(ident)
                 .or(list)
                 .recover_with(nested_delimiters(
