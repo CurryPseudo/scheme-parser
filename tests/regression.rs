@@ -3,7 +3,7 @@ use manifest_dir_macros::*;
 use pretty_assertions::StrComparison;
 use scheme_parser::*;
 use std::ffi::OsStr;
-use std::fs::{self, read_dir, remove_file, File};
+use std::fs::{self, remove_file, File};
 use std::io::{self, Write};
 use std::path::Path;
 use walkdir::WalkDir;

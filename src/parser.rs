@@ -21,24 +21,50 @@ pub enum Expression {
 }
 
 fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
-    let ident = filter_map(|span, token| match token {
-        Token::Ident(v) => Ok(v),
-        other => Err(Simple::expected_input_found(
-            span,
-            Some(Some(Token::Keyword("<identifier>"))),
-            Some(other),
-        )),
-    });
+    macro_rules! select {
+        ($category: literal, {$($p:pat $(if $guard:expr)? => $out:expr),+ $(,)?}) => ({
+            filter_map(move |span: std::ops::Range<usize>, x| match x {
+                $($p $(if $guard)? => ::core::result::Result::Ok($out)),+,
+                other => Err(Simple::expected_input_found(
+                    span,
+                    Some(Some(Token::Keyword($category))),
+                    Some(other),
+                )),
+            })
+        });
+    }
+    macro_rules! map_err_category {
+        ($category: literal, $parser: expr) => {
+            $parser.map_err(|e| {
+                if let chumsky::error::SimpleReason::Unexpected = e.reason() {
+                    let r = Simple::expected_input_found(
+                        e.span(),
+                        Some(Some(Token::Keyword($category))),
+                        e.found().cloned(),
+                    );
+                    if let Some(label) = e.label() {
+                        r.with_label(label)
+                    } else {
+                        r
+                    }
+                } else {
+                    e
+                }
+            })
+        };
+    }
+
+    let ident = select! {
+        "<identifier>",
+        { Token::Ident(v) => v }
+    };
+
     let expr = recursive(|expr| {
         let ident = ident.map(Expression::Ident);
-        let integer = filter_map(|span, token| match token {
-            Token::Integer(v) => Ok(Expression::Integer(v)),
-            other => Err(Simple::expected_input_found(
-                span,
-                Some(Some(Token::Keyword("<integer>"))),
-                Some(other),
-            )),
-        });
+        let integer = select! {
+            "<integer>",
+            { Token::Integer(v) => Expression::Integer(v) }
+        };
         let list = expr
             .repeated()
             .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
@@ -51,27 +77,14 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                 |_| Expression::Error,
             ))
             .labelled("list");
-        integer
-            .or(ident)
-            .or(list)
-            .map_with_span(|expr, span| (expr, span))
-            .labelled("expression")
-            .map_err(|e| {
-                if let chumsky::error::SimpleReason::Unexpected = e.reason() {
-                    let r = Simple::expected_input_found(
-                        e.span(),
-                        Some(Some(Token::Keyword("<expression>"))),
-                        e.found().cloned(),
-                    );
-                    if let Some(label) = e.label() {
-                        r.with_label(label)
-                    } else {
-                        r
-                    }
-                } else {
-                    e
-                }
-            })
+        map_err_category!(
+            "<expression>",
+            integer
+                .or(ident)
+                .or(list)
+                .map_with_span(|expr, span| (expr, span))
+                .labelled("expression")
+        )
     });
     let def = ident
         .then(expr.clone())
