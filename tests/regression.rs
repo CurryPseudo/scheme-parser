@@ -1,5 +1,6 @@
+use backtrace::Backtrace;
 use manifest_dir_macros::*;
-use pretty_assertions::assert_eq;
+use pretty_assertions::StrComparison;
 use scheme_parser::*;
 use std::ffi::OsStr;
 use std::fs::{self, read_dir, remove_file, File};
@@ -12,25 +13,57 @@ fn read_to_string<P: AsRef<Path>>(path: P) -> io::Result<String> {
 fn path_to_string(path: &Path) -> String {
     path.to_str().unwrap().to_string().replace('\\', "/")
 }
-fn assert_eq_or_override(path: &Path, actual: &str) {
+
+#[derive(Default)]
+struct RegressionError {
+    errors: Option<String>,
+}
+
+impl RegressionError {
+    fn insert(&mut self, mut f: impl FnMut(&mut String)) {
+        f(self.errors.get_or_insert_with(Default::default));
+        let current_backtrace = Backtrace::new();
+        let s = self.errors.get_or_insert_with(Default::default);
+        use std::fmt::Write;
+        writeln!(s, "Backtrace: {:?}", current_backtrace).unwrap();
+    }
+    fn expect_ok(&self) {
+        if let Some(errors) = &self.errors {
+            panic!("{}", errors)
+        }
+    }
+}
+
+fn assert_eq_or_override(path: &Path, actual: &str, regression_error: &mut RegressionError) {
     if cfg!(feature = "override-test") {
         let mut file = File::create(path).unwrap();
         file.write_all(actual.as_bytes()).unwrap();
     }
     let expected = read_to_string(path).unwrap_or_else(|_| String::new());
-    assert_eq!(&expected, actual)
+    if expected != actual {
+        regression_error.insert(|s| {
+            use std::fmt::Write;
+            writeln!(s, "{}", StrComparison::new(&expected, actual)).unwrap();
+        })
+    }
 }
 
-fn assert_non_exist(path: &Path) {
+fn assert_non_exist(path: &Path, regression_error: &mut RegressionError) {
     if cfg!(feature = "override-test") && path.exists() {
         remove_file(path).unwrap();
     }
-    assert!(!path.exists());
+    if path.exists() {
+        regression_error.insert(|s| {
+            use std::fmt::Write;
+            writeln!(s, "{} should not exists", path.display()).unwrap();
+        })
+    }
 }
 
 #[test]
 fn regression() {
     let dir = path!("tests/");
+    let mut regression_errors = Default::default();
     for entry in read_dir(dir).unwrap() {
         let path = entry.unwrap().path();
         if path.extension() != Some(OsStr::new("scm")) {
@@ -46,15 +79,15 @@ fn regression() {
             let (result, error) = tokenize(&input, &path_str);
             if let Some(error) = error {
                 let content = error.to_string();
-                assert_eq_or_override(&error_path, &content);
+                assert_eq_or_override(&error_path, &content, &mut regression_errors);
             } else {
-                assert_non_exist(&error_path)
+                assert_non_exist(&error_path, &mut regression_errors);
             }
             if let Some(result) = result {
                 let content = format!("{:#?}", result);
-                assert_eq_or_override(&token_path, &content);
+                assert_eq_or_override(&token_path, &content, &mut regression_errors);
             } else {
-                assert_non_exist(&token_path)
+                assert_non_exist(&token_path, &mut regression_errors);
             }
         }
         {
@@ -65,16 +98,17 @@ fn regression() {
             let (result, error) = parse(&input, &path_str);
             if let Some(error) = error {
                 let content = error.to_string();
-                assert_eq_or_override(&error_path, &content);
+                assert_eq_or_override(&error_path, &content, &mut regression_errors);
             } else {
-                assert_non_exist(&error_path)
+                assert_non_exist(&error_path, &mut regression_errors);
             }
             if let Some(result) = result {
                 let content = format!("{:#?}", result);
-                assert_eq_or_override(&ast_path, &content);
+                assert_eq_or_override(&ast_path, &content, &mut regression_errors);
             } else {
-                assert_non_exist(&ast_path)
+                assert_non_exist(&ast_path, &mut regression_errors);
             }
         }
     }
+    regression_errors.expect_ok();
 }
