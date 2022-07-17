@@ -3,8 +3,10 @@ Program {
         Definition(
             "a",
             (
-                Integer(
-                    312,
+                Primitive(
+                    Integer(
+                        312,
+                    ),
                 ),
                 10..13,
             ),
@@ -12,8 +14,10 @@ Program {
     ],
     exprs: [
         (
-            Integer(
-                12315,
+            Primitive(
+                Integer(
+                    12315,
+                ),
             ),
             15..20,
         ),
@@ -21,20 +25,26 @@ Program {
             List(
                 [
                     (
-                        Integer(
-                            -32314,
+                        Primitive(
+                            Integer(
+                                -32314,
+                            ),
                         ),
                         22..28,
                     ),
                     (
-                        Integer(
-                            312,
+                        Primitive(
+                            Integer(
+                                312,
+                            ),
                         ),
                         30..33,
                     ),
                     (
-                        Integer(
-                            -135,
+                        Primitive(
+                            Integer(
+                                -135,
+                            ),
                         ),
                         34..38,
                     ),
@@ -42,14 +52,18 @@ Program {
                         List(
                             [
                                 (
-                                    Integer(
-                                        513,
+                                    Primitive(
+                                        Integer(
+                                            513,
+                                        ),
                                     ),
                                     40..43,
                                 ),
                                 (
-                                    Integer(
-                                        21,
+                                    Primitive(
+                                        Integer(
+                                            21,
+                                        ),
                                     ),
                                     44..46,
                                 ),
@@ -62,8 +76,10 @@ Program {
             21..48,
         ),
         (
-            Ident(
-                "a",
+            Primitive(
+                Ident(
+                    "a",
+                ),
             ),
             59..60,
         ),
@@ -71,20 +87,26 @@ Program {
             List(
                 [
                     (
-                        Ident(
-                            "+",
+                        Primitive(
+                            Ident(
+                                "+",
+                            ),
                         ),
                         67..68,
                     ),
                     (
-                        Ident(
-                            "a",
+                        Primitive(
+                            Ident(
+                                "a",
+                            ),
                         ),
                         69..70,
                     ),
                     (
-                        Integer(
-                            313,
+                        Primitive(
+                            Integer(
+                                313,
+                            ),
                         ),
                         71..74,
                     ),
@@ -97,20 +119,26 @@ Program {
         List(
             [
                 (
-                    Ident(
-                        "-",
+                    Primitive(
+                        Ident(
+                            "-",
+                        ),
                     ),
                     77..78,
                 ),
                 (
-                    Ident(
-                        "b",
+                    Primitive(
+                        Ident(
+                            "b",
+                        ),
                     ),
                     81..82,
                 ),
                 (
-                    Ident(
-                        "ada",
+                    Primitive(
+                        Ident(
+                            "ada",
+                        ),
                     ),
                     83..86,
                 ),

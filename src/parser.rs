@@ -1,4 +1,5 @@
 use chumsky::{prelude::*, Stream};
+use derive_more::From;
 
 use crate::*;
 
@@ -12,12 +13,10 @@ pub struct Program {
 #[derive(Debug)]
 pub struct Definition(pub String, pub Spanned<Expression>);
 
-#[derive(Debug)]
+#[derive(Debug, From)]
 pub enum Expression {
     List(Vec<Spanned<Expression>>),
-    Integer(i64),
-    Bool(bool),
-    Ident(String),
+    Primitive(Primitive),
     Error,
 }
 
@@ -57,16 +56,14 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
 
     let ident = select! {
         "<identifier>",
-        { Token::Ident(v) => v }
+        { Token::Primitive(Primitive::Ident(v)) => v }
     };
 
     let expr = recursive(|expr| {
-        let ident = ident.map(Expression::Ident);
         let primitive = select! {
             "<primitive>",
             {
-                Token::Integer(v) => Expression::Integer(v),
-                Token::Bool(v) => Expression::Bool(v),
+                Token::Primitive(p) => Expression::Primitive(p),
             }
         };
         let list = expr
@@ -78,7 +75,6 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         map_err_category!(
             "<expression>",
             primitive
-                .or(ident)
                 .or(list)
                 .recover_with(nested_delimiters(
                     Token::Keyword("("),

@@ -2,28 +2,80 @@ Program {
     defs: [],
     exprs: [
         (
-            Ident(
-                "asdf",
+            Primitive(
+                Ident(
+                    "asdf",
+                ),
             ),
             0..4,
         ),
         (
-            Integer(
-                12345,
+            Primitive(
+                Integer(
+                    12345,
+                ),
             ),
             5..10,
         ),
         (
-            Bool(
-                true,
+            Primitive(
+                Real {
+                    numer: 3561245,
+                    denom_log10: 6,
+                },
             ),
-            11..13,
+            11..19,
+        ),
+        (
+            Primitive(
+                Real {
+                    numer: 12316561231323,
+                    denom_log10: 2,
+                },
+            ),
+            20..35,
+        ),
+        (
+            Primitive(
+                Integer(
+                    3154,
+                ),
+            ),
+            36..41,
+        ),
+        (
+            Primitive(
+                Real {
+                    numer: 315124123,
+                    denom_log10: 4,
+                },
+            ),
+            42..53,
+        ),
+        (
+            Primitive(
+                Real {
+                    numer: -316167,
+                    denom_log10: 4,
+                },
+            ),
+            54..62,
+        ),
+        (
+            Primitive(
+                Bool(
+                    true,
+                ),
+            ),
+            63..65,
         ),
     ],
     last_expr: (
-        Bool(
-            false,
+        Primitive(
+            Bool(
+                false,
+            ),
         ),
-        14..16,
+        66..68,
     ),
 }

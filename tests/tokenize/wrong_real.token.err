@@ -1,0 +1,7 @@
+Error: Unexpected char in input
+   ╭─[tests/tokenize/wrong_real.scm:1:6]
+   │
+ 1 │ -315.-5123
+   ·      ┬  
+   ·      ╰── Unexpected char -
+───╯

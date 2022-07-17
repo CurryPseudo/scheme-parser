@@ -3,8 +3,10 @@ Program {
         Definition(
             "a",
             (
-                Integer(
-                    12,
+                Primitive(
+                    Integer(
+                        12,
+                    ),
                 ),
                 10..12,
             ),
@@ -15,14 +17,18 @@ Program {
             List(
                 [
                     (
-                        Ident(
-                            "defineb",
+                        Primitive(
+                            Ident(
+                                "defineb",
+                            ),
                         ),
                         15..22,
                     ),
                     (
-                        Integer(
-                            34,
+                        Primitive(
+                            Integer(
+                                34,
+                            ),
                         ),
                         23..25,
                     ),
@@ -31,14 +37,18 @@ Program {
             14..26,
         ),
         (
-            Integer(
-                412,
+            Primitive(
+                Integer(
+                    412,
+                ),
             ),
             27..30,
         ),
         (
-            Ident(
-                "asdf",
+            Primitive(
+                Ident(
+                    "asdf",
+                ),
             ),
             31..35,
         ),
@@ -47,8 +57,10 @@ Program {
         List(
             [
                 (
-                    Ident(
-                        "asdf",
+                    Primitive(
+                        Ident(
+                            "asdf",
+                        ),
                     ),
                     37..41,
                 ),
