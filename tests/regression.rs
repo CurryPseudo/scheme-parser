@@ -7,6 +7,10 @@ use std::fs::{self, remove_file, File};
 use std::io::{self, Write};
 use std::path::Path;
 use walkdir::WalkDir;
+
+mod span_to_source;
+use span_to_source::*;
+
 fn read_to_string<P: AsRef<Path>>(path: P) -> io::Result<String> {
     let s = fs::read_to_string(path)?;
     Ok(s.replace("\r\n", "\n"))
@@ -98,7 +102,7 @@ fn regression() {
             ast_path.set_extension("ast");
             let (result, error) = parse(&input, &path_str);
             if let (Some(result), None) = (result, &error) {
-                let content = format!("{:#?}", result);
+                let content = format!("{:#?}", SpanToSource(&result, &input));
                 assert_eq_or_override(&ast_path, &content, &mut regression_errors);
             } else {
                 assert_non_exist(&ast_path, &mut regression_errors);

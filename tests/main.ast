@@ -8,7 +8,7 @@ ProcedureBody {
                         312,
                     ),
                 ),
-                10..13,
+                "312",
             ),
         ),
     ],
@@ -19,7 +19,7 @@ ProcedureBody {
                     12315,
                 ),
             ),
-            15..20,
+            "12315",
         ),
         (
             ProcedureCall(
@@ -30,7 +30,7 @@ ProcedureBody {
                                 -32314,
                             ),
                         ),
-                        22..28,
+                        "-32314",
                     ),
                     (
                         Primitive(
@@ -38,7 +38,7 @@ ProcedureBody {
                                 312,
                             ),
                         ),
-                        30..33,
+                        "312",
                     ),
                     (
                         Primitive(
@@ -46,7 +46,7 @@ ProcedureBody {
                                 -135,
                             ),
                         ),
-                        34..38,
+                        "-135",
                     ),
                     (
                         ProcedureCall(
@@ -57,7 +57,7 @@ ProcedureBody {
                                             513,
                                         ),
                                     ),
-                                    40..43,
+                                    "513",
                                 ),
                                 (
                                     Primitive(
@@ -65,15 +65,15 @@ ProcedureBody {
                                             21,
                                         ),
                                     ),
-                                    44..46,
+                                    "21",
                                 ),
                             ],
                         ),
-                        39..47,
+                        "(513 21)",
                     ),
                 ],
             ),
-            21..48,
+            "(-32314  312 -135 (513 21))",
         ),
         (
             Primitive(
@@ -81,7 +81,7 @@ ProcedureBody {
                     "a",
                 ),
             ),
-            59..60,
+            "a",
         ),
         (
             ProcedureCall(
@@ -92,7 +92,7 @@ ProcedureBody {
                                 "+",
                             ),
                         ),
-                        67..68,
+                        "+",
                     ),
                     (
                         Primitive(
@@ -100,7 +100,7 @@ ProcedureBody {
                                 "a",
                             ),
                         ),
-                        69..70,
+                        "a",
                     ),
                     (
                         Primitive(
@@ -108,11 +108,11 @@ ProcedureBody {
                                 313,
                             ),
                         ),
-                        71..74,
+                        "313",
                     ),
                 ],
             ),
-            66..75,
+            "(+ a 313)",
         ),
     ],
     last_expr: (
@@ -124,7 +124,7 @@ ProcedureBody {
                             "-",
                         ),
                     ),
-                    77..78,
+                    "-",
                 ),
                 (
                     Primitive(
@@ -132,7 +132,7 @@ ProcedureBody {
                             "b",
                         ),
                     ),
-                    81..82,
+                    "b",
                 ),
                 (
                     Primitive(
@@ -140,10 +140,10 @@ ProcedureBody {
                             "ada",
                         ),
                     ),
-                    83..86,
+                    "ada",
                 ),
             ],
         ),
-        76..87,
+        "(-   b ada)",
     ),
 }

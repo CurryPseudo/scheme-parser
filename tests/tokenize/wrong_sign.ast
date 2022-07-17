@@ -7,7 +7,7 @@ ProcedureBody {
                     3123,
                 ),
             ),
-            0..4,
+            "3123",
         ),
         (
             Primitive(
@@ -15,7 +15,7 @@ ProcedureBody {
                     3123,
                 ),
             ),
-            5..10,
+            "+3123",
         ),
         (
             Primitive(
@@ -23,7 +23,7 @@ ProcedureBody {
                     -3123,
                 ),
             ),
-            11..16,
+            "-3123",
         ),
         (
             Primitive(
@@ -31,7 +31,7 @@ ProcedureBody {
                     "++3123",
                 ),
             ),
-            17..23,
+            "++3123",
         ),
         (
             Primitive(
@@ -39,7 +39,7 @@ ProcedureBody {
                     "--3213",
                 ),
             ),
-            24..30,
+            "--3213",
         ),
     ],
     last_expr: (
@@ -48,6 +48,6 @@ ProcedureBody {
                 "+-3123",
             ),
         ),
-        31..37,
+        "+-3123",
     ),
 }
