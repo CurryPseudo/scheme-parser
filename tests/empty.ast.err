@@ -1,4 +1,4 @@
-Error: Unexpected end of input while parsing expression, expected (, <expression>
+Error: Unexpected end of input while parsing expression, expected <definition>, <expression>
    ╭─[tests/empty.scm:1:1]
    │
  1 │ 

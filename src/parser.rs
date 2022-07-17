@@ -86,14 +86,17 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                 .labelled("expression")
         )
     });
-    let def = ident
-        .then(expr.clone())
-        .delimited_by(
-            just(vec![Token::Keyword("("), Token::Keyword("define")]),
-            just(Token::Keyword(")")),
-        )
-        .map(|(ident, expr)| Definition(ident, expr))
-        .labelled("definition");
+    let def = map_err_category!(
+        "<definition>",
+        ident
+            .then(expr.clone())
+            .delimited_by(
+                just(vec![Token::Keyword("("), Token::Keyword("define")]),
+                just(Token::Keyword(")")),
+            )
+            .map(|(ident, expr)| Definition(ident, expr))
+            .labelled("definition")
+    );
     def.repeated()
         .then(expr.repeated().at_least(1))
         .map(|(defs, exprs)| {
