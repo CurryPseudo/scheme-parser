@@ -123,7 +123,10 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         .then_ignore(end())
 }
 
-pub fn parse(source: &str, source_path: &str) -> (Option<Program>, Option<ParseError<Token>>) {
+pub fn parse<'a>(
+    source: &'a str,
+    source_path: &'a str,
+) -> (Option<Program>, Option<ParseError<'a, Token>>) {
     let (tokens, _) = tokenize(source, source_path);
     if let Some(tokens) = tokens {
         let len = source.len();
@@ -135,8 +138,8 @@ pub fn parse(source: &str, source_path: &str) -> (Option<Program>, Option<ParseE
                 None
             } else {
                 Some(ParseError {
-                    source: source.to_string(),
-                    source_path: source_path.to_string(),
+                    source,
+                    source_path,
                     simple: error,
                     type_name: "token",
                     colorful: false,

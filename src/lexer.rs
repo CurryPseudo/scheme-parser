@@ -123,10 +123,10 @@ pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
         .then_ignore(end())
 }
 
-pub fn tokenize(
-    source: &str,
-    source_path: &str,
-) -> (Option<Vec<Spanned<Token>>>, Option<ParseError<char>>) {
+pub fn tokenize<'a>(
+    source: &'a str,
+    source_path: &'a str,
+) -> (Option<Vec<Spanned<Token>>>, Option<ParseError<'a, char>>) {
     let (tokens, e) = lexer().parse_recovery(source);
     (
         tokens,
@@ -134,8 +134,8 @@ pub fn tokenize(
             None
         } else {
             Some(ParseError {
-                source: source.to_string(),
-                source_path: source_path.to_string(),
+                source,
+                source_path,
                 simple: e,
                 type_name: "char",
                 colorful: false,
