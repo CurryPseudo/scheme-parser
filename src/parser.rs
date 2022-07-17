@@ -70,18 +70,18 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
             .collect::<Vec<_>>()
             .map(Expression::List)
-            .recover_with(nested_delimiters(
-                Token::Keyword("("),
-                Token::Keyword(")"),
-                [],
-                |_| Expression::Error,
-            ))
             .labelled("list");
         map_err_category!(
             "<expression>",
             integer
                 .or(ident)
                 .or(list)
+                .recover_with(nested_delimiters(
+                    Token::Keyword("("),
+                    Token::Keyword(")"),
+                    [],
+                    |_| Expression::Error,
+                ))
                 .map_with_span(|expr, span| (expr, span))
                 .labelled("expression")
         )
@@ -114,7 +114,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             }
         })
         .labelled("program")
-        .then_ignore(end().recover_with(skip_then_retry_until([])))
+        .then_ignore(end())
 }
 
 pub fn parse(source: &str, source_path: &str) -> (Option<Program>, Option<ParseError<Token>>) {

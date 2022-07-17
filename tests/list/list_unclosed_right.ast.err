@@ -1,4 +1,4 @@
-Error: Unclosed delimiter ( while parsing list
+Error: Unclosed delimiter ( while parsing expression
    ╭─[tests/list/list_unclosed_right.scm:1:6]
    │
  1 │ (3132
