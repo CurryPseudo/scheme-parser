@@ -17,8 +17,12 @@ pub struct Definition(pub String, pub Spanned<Expression>);
 
 #[derive(Debug, From)]
 pub enum Expression {
-    ProceduralCall(Vec<Spanned<Expression>>),
+    ProcedureCall(Vec<Spanned<Expression>>),
     Primitive(Primitive),
+    Procedure {
+        args: Vec<Spanned<Expression>>,
+        body: Box<ProcedureBody>,
+    },
     Error,
 }
 
@@ -68,16 +72,16 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                 Token::Primitive(p) => Expression::Primitive(p),
             }
         };
-        let list = expr
+        let proc_call = expr
             .repeated()
             .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
             .collect::<Vec<_>>()
-            .map(Expression::ProceduralCall)
-            .labelled("list");
+            .map(Expression::ProcedureCall)
+            .labelled("procedure call");
         map_err_category!(
             "<expression>",
             primitive
-                .or(list)
+                .or(proc_call)
                 .recover_with(nested_delimiters(
                     Token::Keyword("("),
                     Token::Keyword(")"),

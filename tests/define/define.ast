@@ -14,7 +14,7 @@ ProcedureBody {
     ],
     exprs: [
         (
-            ProceduralCall(
+            ProcedureCall(
                 [
                     (
                         Primitive(
@@ -54,7 +54,7 @@ ProcedureBody {
         ),
     ],
     last_expr: (
-        ProceduralCall(
+        ProcedureCall(
             [
                 (
                     Primitive(

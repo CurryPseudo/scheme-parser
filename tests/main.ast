@@ -22,7 +22,7 @@ ProcedureBody {
             15..20,
         ),
         (
-            ProceduralCall(
+            ProcedureCall(
                 [
                     (
                         Primitive(
@@ -49,7 +49,7 @@ ProcedureBody {
                         34..38,
                     ),
                     (
-                        ProceduralCall(
+                        ProcedureCall(
                             [
                                 (
                                     Primitive(
@@ -84,7 +84,7 @@ ProcedureBody {
             59..60,
         ),
         (
-            ProceduralCall(
+            ProcedureCall(
                 [
                     (
                         Primitive(
@@ -116,7 +116,7 @@ ProcedureBody {
         ),
     ],
     last_expr: (
-        ProceduralCall(
+        ProcedureCall(
             [
                 (
                     Primitive(

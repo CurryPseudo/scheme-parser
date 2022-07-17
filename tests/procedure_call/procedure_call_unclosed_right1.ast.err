@@ -1,5 +1,5 @@
 Error: Unclosed delimiter ( while parsing expression
-   ╭─[tests/list/list_unclosed_right1.scm:1:10]
+   ╭─[tests/procedure_call/procedure_call_unclosed_right1.scm:1:10]
    │
  1 │ (3132 ( a
    ·       ┬  ┬  
