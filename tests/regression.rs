@@ -83,7 +83,7 @@ fn regression() {
             token_path.set_extension("token");
             let (result, error) = tokenize(&input, &path_str);
             if let (Some(result), None) = (result, &error) {
-                let content = format!("{:#?}", result);
+                let content = format!("{:#?}", SpanToSource(&result, &input));
                 assert_eq_or_override(&token_path, &content, &mut regression_errors);
             } else {
                 assert_non_exist(&token_path, &mut regression_errors);

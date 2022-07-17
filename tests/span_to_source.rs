@@ -65,3 +65,12 @@ impl<'a> Debug for SpanToSource<'a, Expression> {
         }
     }
 }
+
+impl<'a> Debug for SpanToSource<'a, Spanned<Token>> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("")
+            .field(&self.0 .0)
+            .field(&&self.1[self.0 .1.clone()] as &dyn Debug)
+            .finish()
+    }
+}
