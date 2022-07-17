@@ -1,0 +1,18 @@
+Program {
+    defs: [
+        Definition(
+            "a",
+            (
+                Integer(
+                    3154,
+                ),
+                10..14,
+            ),
+        ),
+    ],
+    exprs: [],
+    last_expr: (
+        Error,
+        16..28,
+    ),
+}
