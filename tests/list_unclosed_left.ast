@@ -1,0 +1,9 @@
+Program {
+    exprs: [],
+    last_expr: (
+        Integer(
+            32,
+        ),
+        0..2,
+    ),
+}

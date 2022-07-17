@@ -1,5 +1,5 @@
 Error: Unexpected char in input
-   ╭─[tests/tokenize/error/tokenize.scm:1:1]
+   ╭─[tests/tokenize.scm:1:1]
    │
  1 │ ```
    · ┬  

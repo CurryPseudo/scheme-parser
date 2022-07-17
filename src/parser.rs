@@ -63,25 +63,28 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
 
 pub fn parse(source: &str, source_path: &str) -> (Option<Program>, Option<ParseError<Token>>) {
     let (tokens, _) = tokenize(source, source_path);
-    let tokens = tokens.unwrap();
-    let len = source.len();
-    let (program, error) =
-        parser().parse_recovery(Stream::from_iter(len..len + 1, tokens.into_iter()));
-    (
-        program,
-        if error.is_empty() {
-            None
-        } else {
-            Some(ParseError {
-                source: source.to_string(),
-                source_path: source_path.to_string(),
-                simple: error,
-                type_name: "token",
-                colorful: false,
-                display_every_expected: true,
-            })
-        },
-    )
+    if let Some(tokens) = tokens {
+        let len = source.len();
+        let (program, error) =
+            parser().parse_recovery(Stream::from_iter(len..len + 1, tokens.into_iter()));
+        (
+            program,
+            if error.is_empty() {
+                None
+            } else {
+                Some(ParseError {
+                    source: source.to_string(),
+                    source_path: source_path.to_string(),
+                    simple: error,
+                    type_name: "token",
+                    colorful: false,
+                    display_every_expected: true,
+                })
+            },
+        )
+    } else {
+        (None, None)
+    }
 }
 
 #[cfg(test)]
