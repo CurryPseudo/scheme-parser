@@ -1,9 +1,8 @@
-(define a 312)
-12315
-(-32314  312 -135 (513 21));))
-; what
-a ; ok
-(+ a 313)
+(define a -312)
+(define b 1235)
+(define aba 3.126)
+(define true #t)
+(define false #f)
+; this is a comment
+(+ a 313) ; this is a comment too
 (-   b ada)
-
-;a

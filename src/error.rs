@@ -54,9 +54,15 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
                             write!(msg, ", expected ").unwrap();
                             let mut expected = error
                                 .expected()
-                                .map(|expected| match expected {
-                                    Some(expected) => expected.to_string(),
-                                    None => "end of input".to_string(),
+                                .map(|expected| {
+                                    fg!(
+                                        match expected {
+                                            Some(expected) => expected.to_string(),
+                                            None => "end of input".to_string(),
+                                        },
+                                        Color::Yellow
+                                    )
+                                    .to_string()
                                 })
                                 .collect::<Vec<_>>();
                             expected.sort();
@@ -67,13 +73,12 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
                     .with_label(with_color!(
                         Label::new((self.source_path, error.span())).with_message(format!(
                             "Unexpected {}",
-                            fg!(
-                                error
-                                    .found()
-                                    .map(|c| format!("{} {}", self.type_name, c))
-                                    .unwrap_or_else(|| "end of file".to_string()),
-                                Color::Red
-                            )
+                            error
+                                .found()
+                                .map(|c| format!("{} {}", self.type_name, fg!(c, Color::Red)))
+                                .unwrap_or_else(
+                                    || fg!("end of file".to_string(), Color::Red).to_string()
+                                ),
                         )),
                         Color::Red
                     )),
