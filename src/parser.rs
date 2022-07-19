@@ -20,10 +20,26 @@ pub enum Expression {
     ProcedureCall(Vec<Spanned<Expression>>),
     Primitive(Primitive),
     Procedure {
+        /// Arguments
         args: Vec<Spanned<String>>,
+        /// Procedure Body
         body: Box<ProcedureBody>,
     },
+    Conditional {
+        /// Test
+        test: Box<Spanned<Expression>>,
+        /// Consequent
+        conseq: Box<Spanned<Expression>>,
+        /// Alternative
+        alter: Option<Box<Spanned<Expression>>>,
+    },
     Error,
+}
+
+fn enclosed<T>(
+    parser: impl Parser<Token, T, Error = Simple<Token>>,
+) -> impl Parser<Token, T, Error = Simple<Token>> {
+    parser.delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
 }
 
 fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
@@ -73,28 +89,37 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                     Token::Primitive(p) => Expression::Primitive(p),
                 }
             };
-            let formals = ident
-                .map_with_span(|ident, span| (ident, span))
-                .repeated()
-                .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")));
+            let formals = enclosed(ident.map_with_span(|ident, span| (ident, span)).repeated());
 
-            let lambda = formals
-                .then(proc_body.map(Box::new))
-                .map(|(args, body)| Expression::Procedure { args, body })
-                .delimited_by(
-                    just([Token::Keyword("("), Token::Keyword("lambda")]),
-                    just(Token::Keyword(")")),
-                );
+            let lambda = enclosed(
+                just(Token::Keyword("lambda"))
+                    .ignore_then(formals)
+                    .then(proc_body.map(Box::new))
+                    .map(|(args, body)| Expression::Procedure { args, body }),
+            );
 
-            let proc_call = expr
-                .repeated()
-                .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
-                .collect::<Vec<_>>()
-                .map(Expression::ProcedureCall)
-                .labelled("procedure call");
+            let if_expr = enclosed(
+                just(Token::Keyword("if"))
+                    .ignore_then(expr.clone())
+                    .then(expr.clone())
+                    .then(expr.clone().or_not()),
+            )
+            .map(|((test, conseq), alter)| Expression::Conditional {
+                test: Box::new(test),
+                conseq: Box::new(conseq),
+                alter: alter.map(Box::new),
+            });
+
+            let proc_call = enclosed(
+                expr.repeated()
+                    .collect::<Vec<_>>()
+                    .map(Expression::ProcedureCall),
+            )
+            .labelled("procedure call");
             map_err_category!(
                 "<expression>",
                 primitive
+                    .or(if_expr)
                     .or(lambda)
                     .or(proc_call)
                     .recover_with(nested_delimiters(
@@ -109,14 +134,13 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         });
         let def = map_err_category!(
             "<definition>",
-            ident
-                .then(expr.clone())
-                .delimited_by(
-                    just(vec![Token::Keyword("("), Token::Keyword("define")]),
-                    just(Token::Keyword(")")),
-                )
-                .map(|(ident, expr)| Definition(ident, expr))
-                .labelled("definition")
+            enclosed(
+                just(Token::Keyword("define"))
+                    .ignore_then(ident)
+                    .then(expr.clone())
+            )
+            .map(|(ident, expr)| Definition(ident, expr))
+            .labelled("definition")
         );
         def.repeated()
             .then(expr.repeated().at_least(1))

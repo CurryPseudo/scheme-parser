@@ -67,7 +67,8 @@ pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
     let keyword = char!("(")
         .or(char!(")"))
         .or(keyword!("define"))
-        .or(keyword!("lambda"));
+        .or(keyword!("lambda"))
+        .or(keyword!("if"));
     let boolean = choice((
         just("#t").to(Primitive::Bool(true).into()),
         just("#f").to(Primitive::Bool(false).into()),

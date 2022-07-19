@@ -20,6 +20,27 @@ impl<'a> Debug for SpanToSource<'a, Program> {
     }
 }
 
+impl<'a, T: Debug> Debug for SpanToSource<'a, Box<T>>
+where
+    SpanToSource<'a, T>: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.replace(self.0.as_ref()).fmt(f)
+    }
+}
+
+impl<'a, T: Debug> Debug for SpanToSource<'a, Option<T>>
+where
+    SpanToSource<'a, T>: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.0 {
+            Some(t) => f.debug_tuple("Some").field(&self.replace(t)).finish(),
+            None => f.debug_struct("None").finish(),
+        }
+    }
+}
+
 impl<'a, T: Debug> Debug for SpanToSource<'a, Vec<T>>
 where
     SpanToSource<'a, T>: Debug,
@@ -61,7 +82,17 @@ impl<'a> Debug for SpanToSource<'a, Expression> {
                 .field(&self.replace(args))
                 .field(&self.replace(body.as_ref()))
                 .finish(),
-            other => other.fmt(f),
+            Expression::Primitive(_) | Expression::Error => self.0.fmt(f),
+            Expression::Conditional {
+                test,
+                conseq,
+                alter,
+            } => f
+                .debug_struct("Conditional")
+                .field("test", &self.replace(test))
+                .field("conseq", &self.replace(conseq))
+                .field("alter", &self.replace(alter))
+                .finish(),
         }
     }
 }
