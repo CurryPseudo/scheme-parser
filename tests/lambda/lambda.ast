@@ -6,7 +6,9 @@ ProcedureBody {
                 args: [
                     (
                         "x",
-                        "x",
+                        Source(
+                            "x",
+                        ),
                     ),
                 ],
                 body: ProcedureBody {
@@ -29,11 +31,15 @@ ProcedureBody {
                 args: [
                     (
                         "x",
-                        "x",
+                        Source(
+                            "x",
+                        ),
                     ),
                     (
                         "y",
-                        "y",
+                        Source(
+                            "y",
+                        ),
                     ),
                 ],
                 body: ProcedureBody {
@@ -57,11 +63,15 @@ ProcedureBody {
             args: [
                 (
                     "x",
-                    "x",
+                    Source(
+                        "x",
+                    ),
                 ),
                 (
                     "y",
-                    "y",
+                    Source(
+                        "y",
+                    ),
                 ),
             ],
             body: ProcedureBody {

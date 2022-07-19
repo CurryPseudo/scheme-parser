@@ -99,11 +99,14 @@ impl<'a> Debug for SpanToSource<'a, Expression> {
 
 trait Root {}
 
+#[derive(Debug)]
+struct Source<T>(T);
+
 impl<'a, T: Debug + Root> Debug for SpanToSource<'a, Spanned<T>> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_tuple("")
             .field(&self.0 .0)
-            .field(&&self.1[self.0 .1.clone()] as &dyn Debug)
+            .field(&Source(&self.1[self.0 .1.clone()]) as &dyn Debug)
             .finish()
     }
 }
