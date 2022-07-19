@@ -1,0 +1,168 @@
+ProcedureBody {
+    defs: [],
+    exprs: [
+        (
+            Procedure(
+                [
+                    (
+                        "x",
+                        "x",
+                    ),
+                ],
+                ProcedureBody {
+                    defs: [],
+                    exprs: [],
+                    last_expr: (
+                        Primitive(
+                            Ident(
+                                "x",
+                            ),
+                        ),
+                        "x",
+                    ),
+                },
+            ),
+            "(lambda (x) x)",
+        ),
+        (
+            Procedure(
+                [
+                    (
+                        "x",
+                        "x",
+                    ),
+                    (
+                        "y",
+                        "y",
+                    ),
+                ],
+                ProcedureBody {
+                    defs: [],
+                    exprs: [],
+                    last_expr: (
+                        Primitive(
+                            Ident(
+                                "x",
+                            ),
+                        ),
+                        "x",
+                    ),
+                },
+            ),
+            "(lambda (x y) x)",
+        ),
+    ],
+    last_expr: (
+        Procedure(
+            [
+                (
+                    "x",
+                    "x",
+                ),
+                (
+                    "y",
+                    "y",
+                ),
+            ],
+            ProcedureBody {
+                defs: [
+                    Definition(
+                        "z",
+                        (
+                            ProcedureCall(
+                                [
+                                    (
+                                        Primitive(
+                                            Ident(
+                                                "x",
+                                            ),
+                                        ),
+                                        "x",
+                                    ),
+                                    (
+                                        Primitive(
+                                            Real {
+                                                numer: 357,
+                                                denom_log10: 2,
+                                            },
+                                        ),
+                                        "3.57",
+                                    ),
+                                ],
+                            ),
+                            "(x 3.57)",
+                        ),
+                    ),
+                    Definition(
+                        "y",
+                        (
+                            ProcedureCall(
+                                [
+                                    (
+                                        Primitive(
+                                            Ident(
+                                                "z",
+                                            ),
+                                        ),
+                                        "z",
+                                    ),
+                                    (
+                                        Primitive(
+                                            Bool(
+                                                true,
+                                            ),
+                                        ),
+                                        "#t",
+                                    ),
+                                ],
+                            ),
+                            "(z #t)",
+                        ),
+                    ),
+                ],
+                exprs: [
+                    (
+                        ProcedureCall(
+                            [
+                                (
+                                    Primitive(
+                                        Ident(
+                                            "x",
+                                        ),
+                                    ),
+                                    "x",
+                                ),
+                                (
+                                    Primitive(
+                                        Integer(
+                                            -1235,
+                                        ),
+                                    ),
+                                    "-1235",
+                                ),
+                                (
+                                    Primitive(
+                                        Ident(
+                                            "z",
+                                        ),
+                                    ),
+                                    "z",
+                                ),
+                            ],
+                        ),
+                        "(x -1235 z)",
+                    ),
+                ],
+                last_expr: (
+                    Primitive(
+                        Ident(
+                            "y",
+                        ),
+                    ),
+                    "y",
+                ),
+            },
+        ),
+        "(lambda (x y) \n  (define z (x 3.57))\n  (define y (z #t))\n  (x -1235 z)\n  y\n)",
+    ),
+}

@@ -20,7 +20,7 @@ pub enum Expression {
     ProcedureCall(Vec<Spanned<Expression>>),
     Primitive(Primitive),
     Procedure {
-        args: Vec<Spanned<Expression>>,
+        args: Vec<Spanned<String>>,
         body: Box<ProcedureBody>,
     },
     Error,
@@ -65,62 +65,78 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         { Token::Primitive(Primitive::Ident(v)) => v }
     };
 
-    let expr = recursive(|expr| {
-        let primitive = select! {
-            "<primitive>",
-            {
-                Token::Primitive(p) => Expression::Primitive(p),
-            }
-        };
-        let proc_call = expr
-            .repeated()
-            .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
-            .collect::<Vec<_>>()
-            .map(Expression::ProcedureCall)
-            .labelled("procedure call");
-        map_err_category!(
-            "<expression>",
-            primitive
-                .or(proc_call)
-                .recover_with(nested_delimiters(
-                    Token::Keyword("("),
-                    Token::Keyword(")"),
-                    [],
-                    |_| Expression::Error,
-                ))
-                .map_with_span(|expr, span| (expr, span))
-                .labelled("expression")
-        )
-    });
-    let def = map_err_category!(
-        "<definition>",
-        ident
-            .then(expr.clone())
-            .delimited_by(
-                just(vec![Token::Keyword("("), Token::Keyword("define")]),
-                just(Token::Keyword(")")),
+    let proc_body = recursive(|proc_body| {
+        let expr = recursive(|expr| {
+            let primitive = select! {
+                "<primitive>",
+                {
+                    Token::Primitive(p) => Expression::Primitive(p),
+                }
+            };
+            let formals = ident
+                .map_with_span(|ident, span| (ident, span))
+                .repeated()
+                .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")));
+
+            let lambda = formals
+                .then(proc_body.map(Box::new))
+                .map(|(args, body)| Expression::Procedure { args, body })
+                .delimited_by(
+                    just([Token::Keyword("("), Token::Keyword("lambda")]),
+                    just(Token::Keyword(")")),
+                );
+
+            let proc_call = expr
+                .repeated()
+                .delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
+                .collect::<Vec<_>>()
+                .map(Expression::ProcedureCall)
+                .labelled("procedure call");
+            map_err_category!(
+                "<expression>",
+                primitive
+                    .or(lambda)
+                    .or(proc_call)
+                    .recover_with(nested_delimiters(
+                        Token::Keyword("("),
+                        Token::Keyword(")"),
+                        [],
+                        |_| Expression::Error,
+                    ))
+                    .map_with_span(|expr, span| (expr, span))
+                    .labelled("expression")
             )
-            .map(|(ident, expr)| Definition(ident, expr))
-            .labelled("definition")
-    );
-    def.repeated()
-        .then(expr.repeated().at_least(1))
-        .map(|(defs, exprs)| {
-            let len = exprs.len();
-            let mut iter = exprs.into_iter();
-            let mut exprs = Vec::new();
-            for _ in 0..len - 1 {
-                exprs.push(iter.next().unwrap());
-            }
-            let last_expr = iter.next().unwrap();
-            Program {
-                defs,
-                exprs,
-                last_expr,
-            }
-        })
-        .labelled("program")
-        .then_ignore(end())
+        });
+        let def = map_err_category!(
+            "<definition>",
+            ident
+                .then(expr.clone())
+                .delimited_by(
+                    just(vec![Token::Keyword("("), Token::Keyword("define")]),
+                    just(Token::Keyword(")")),
+                )
+                .map(|(ident, expr)| Definition(ident, expr))
+                .labelled("definition")
+        );
+        def.repeated()
+            .then(expr.repeated().at_least(1))
+            .map(|(defs, exprs)| {
+                let len = exprs.len();
+                let mut iter = exprs.into_iter();
+                let mut exprs = Vec::new();
+                for _ in 0..len - 1 {
+                    exprs.push(iter.next().unwrap());
+                }
+                let last_expr = iter.next().unwrap();
+                Program {
+                    defs,
+                    exprs,
+                    last_expr,
+                }
+            })
+            .labelled("procedure body")
+    });
+    proc_body.labelled("program").then_ignore(end())
 }
 
 pub fn parse<'a>(

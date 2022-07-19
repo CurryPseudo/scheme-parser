@@ -66,7 +66,9 @@ impl<'a> Debug for SpanToSource<'a, Expression> {
     }
 }
 
-impl<'a> Debug for SpanToSource<'a, Spanned<Token>> {
+trait Root {}
+
+impl<'a, T: Debug + Root> Debug for SpanToSource<'a, Spanned<T>> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_tuple("")
             .field(&self.0 .0)
@@ -74,3 +76,6 @@ impl<'a> Debug for SpanToSource<'a, Spanned<Token>> {
             .finish()
     }
 }
+
+impl Root for Token {}
+impl Root for String {}
