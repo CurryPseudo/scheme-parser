@@ -1,0 +1,7 @@
+Error: Unexpected token in input while parsing expression, expected ), <identifier>
+   ╭─[tests/lambda/lambda-arg.scm:1:12]
+   │
+ 1 │ (lambda (a 3.5)
+   ·            ─┬─  
+   ·             ╰─── Unexpected token 3.5
+───╯

@@ -1,0 +1,7 @@
+Error: Unexpected token in input while parsing expression, expected ), <expression>, lambda
+   ╭─[tests/lambda/lambda-body.scm:4:6]
+   │
+ 4 │     (define z x)
+   ·      ───┬──  
+   ·         ╰──── Unexpected token define
+───╯
