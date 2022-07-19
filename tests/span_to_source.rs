@@ -78,9 +78,9 @@ impl<'a> Debug for SpanToSource<'a, Expression> {
                 .field(&self.replace(exprs))
                 .finish(),
             Expression::Procedure { args, body } => f
-                .debug_tuple("Procedure")
-                .field(&self.replace(args))
-                .field(&self.replace(body.as_ref()))
+                .debug_struct("Procedure")
+                .field("args", &self.replace(args))
+                .field("body", &self.replace(body.as_ref()))
                 .finish(),
             Expression::Primitive(_) | Expression::Error => self.0.fmt(f),
             Expression::Conditional {
