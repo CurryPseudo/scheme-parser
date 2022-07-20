@@ -1,0 +1,7 @@
+Error: Unexpected token in input while parsing expression, expected <expression>, if, lambda
+   ╭─[tests/define/proc-without-ident.scm:1:2]
+   │
+ 1 │ (define () foo)
+   ·  ───┬──  
+   ·     ╰──── Unexpected token define
+───╯
