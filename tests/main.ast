@@ -1,7 +1,12 @@
 ProcedureBody {
     defs: [
         Definition(
-            "a",
+            (
+                "a",
+                Source(
+                    "a",
+                ),
+            ),
             (
                 Primitive(
                     Integer(
@@ -12,7 +17,12 @@ ProcedureBody {
             ),
         ),
         Definition(
-            "b",
+            (
+                "b",
+                Source(
+                    "b",
+                ),
+            ),
             (
                 Primitive(
                     Integer(
@@ -23,7 +33,12 @@ ProcedureBody {
             ),
         ),
         Definition(
-            "aba",
+            (
+                "aba",
+                Source(
+                    "aba",
+                ),
+            ),
             (
                 Primitive(
                     Real {
@@ -35,7 +50,12 @@ ProcedureBody {
             ),
         ),
         Definition(
-            "true",
+            (
+                "true",
+                Source(
+                    "true",
+                ),
+            ),
             (
                 Primitive(
                     Bool(
@@ -46,7 +66,12 @@ ProcedureBody {
             ),
         ),
         Definition(
-            "false",
+            (
+                "false",
+                Source(
+                    "false",
+                ),
+            ),
             (
                 Primitive(
                     Bool(

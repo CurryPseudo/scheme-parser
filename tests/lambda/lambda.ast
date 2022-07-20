@@ -102,7 +102,12 @@ ProcedureBody {
             body: ProcedureBody {
                 defs: [
                     Definition(
-                        "z",
+                        (
+                            "z",
+                            Source(
+                                "z",
+                            ),
+                        ),
                         (
                             ProcedureCall {
                                 operator: (
@@ -129,7 +134,12 @@ ProcedureBody {
                         ),
                     ),
                     Definition(
-                        "y",
+                        (
+                            "y",
+                            Source(
+                                "y",
+                            ),
+                        ),
                         (
                             ProcedureCall {
                                 operator: (

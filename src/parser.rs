@@ -13,7 +13,7 @@ pub struct ProcedureBody {
 pub type Program = ProcedureBody;
 
 #[derive(Debug)]
-pub struct Definition(pub String, pub Spanned<Expression>);
+pub struct Definition(pub Spanned<String>, pub Spanned<Expression>);
 
 #[derive(Debug, From)]
 pub enum Expression {
@@ -148,7 +148,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         )
         .map_with_span(|((ident, args), body), span| {
             Definition(
-                ident.0,
+                ident,
                 (
                     Expression::Procedure {
                         args,
@@ -163,7 +163,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             def_proc
                 .or(enclosed(
                     just(Token::Keyword("define"))
-                        .ignore_then(ident)
+                        .ignore_then(spanned_ident)
                         .then(expr.clone())
                 )
                 .map(|(ident, expr)| Definition(ident, expr)))

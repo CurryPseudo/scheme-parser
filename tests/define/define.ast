@@ -1,7 +1,12 @@
 ProcedureBody {
     defs: [
         Definition(
-            "a",
+            (
+                "a",
+                Source(
+                    "a",
+                ),
+            ),
             (
                 Primitive(
                     Integer(
@@ -12,7 +17,12 @@ ProcedureBody {
             ),
         ),
         Definition(
-            "one",
+            (
+                "one",
+                Source(
+                    "one",
+                ),
+            ),
             (
                 Procedure {
                     args: [],
@@ -33,7 +43,12 @@ ProcedureBody {
             ),
         ),
         Definition(
-            "id",
+            (
+                "id",
+                Source(
+                    "id",
+                ),
+            ),
             (
                 Procedure {
                     args: [

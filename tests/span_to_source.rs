@@ -55,7 +55,7 @@ where
 impl<'a> Debug for SpanToSource<'a, Definition> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_tuple("Definition")
-            .field(&self.0 .0)
+            .field(&self.replace(&self.0 .0))
             .field(&self.replace(&self.0 .1))
             .finish()
     }
