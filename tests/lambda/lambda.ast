@@ -35,6 +35,31 @@ ProcedureBody {
                             "x",
                         ),
                     ),
+                ],
+                body: ProcedureBody {
+                    defs: [],
+                    exprs: [],
+                    last_expr: (
+                        Primitive(
+                            Ident(
+                                "x",
+                            ),
+                        ),
+                        "x",
+                    ),
+                },
+            },
+            "(lambda x x)",
+        ),
+        (
+            Procedure {
+                args: [
+                    (
+                        "x",
+                        Source(
+                            "x",
+                        ),
+                    ),
                     (
                         "y",
                         Source(

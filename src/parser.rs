@@ -92,7 +92,10 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                     Token::Primitive(p) => Expression::Primitive(p),
                 }
             };
-            let formals = enclosed(ident.map_with_span(|ident, span| (ident, span)).repeated());
+            let formals =
+                enclosed(ident.map_with_span(|ident, span| (ident, span)).repeated()).or(ident
+                    .map_with_span(|ident, span| (ident, span))
+                    .map(|ident| vec![ident]));
 
             let lambda = enclosed(
                 just(Token::Keyword("lambda"))

@@ -1,4 +1,5 @@
 (lambda (x) x)
+(lambda x x)
 (lambda (x y) x)
 (lambda (x y) 
   (define z (x 3.57))
