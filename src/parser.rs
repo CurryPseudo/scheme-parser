@@ -1,4 +1,6 @@
-use chumsky::{prelude::*, Stream};
+use std::ops::Range;
+
+use chumsky::{combinator::MapWithSpan, prelude::*, Stream};
 use derive_more::From;
 
 use crate::*;
@@ -45,6 +47,12 @@ fn enclosed<T>(
     parser.delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
 }
 
+fn spanned<T, I: Parser<Token, T, Error = Simple<Token>>>(
+    parser: I,
+) -> MapWithSpan<I, impl Fn(T, Range<usize>) -> (T, Range<usize>) + Clone + Copy, T> {
+    parser.map_with_span(|t, span| (t, span))
+}
+
 fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
     macro_rules! select {
         ($category: literal, {$($p:pat $(if $guard:expr)? => $out:expr),+ $(,)?}) => ({
@@ -79,12 +87,10 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         };
     }
 
-    let ident = select! {
+    let ident = spanned(select! {
         "<identifier>",
         { Token::Primitive(Primitive::Ident(v)) => v }
-    };
-
-    let spanned_ident = ident.map_with_span(|ident, span| (ident, span));
+    });
 
     let proc_body = recursive(|proc_body| {
         let expr = recursive(|expr| {
@@ -94,10 +100,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                     Token::Primitive(p) => Expression::Primitive(p),
                 }
             };
-            let formals =
-                enclosed(ident.map_with_span(|ident, span| (ident, span)).repeated()).or(ident
-                    .map_with_span(|ident, span| (ident, span))
-                    .map(|ident| vec![ident]));
+            let formals = enclosed(ident.repeated()).or(ident.map(|ident| vec![ident]));
 
             let lambda = enclosed(
                 just(Token::Keyword("lambda"))
@@ -127,23 +130,17 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             .labelled("procedure call");
             map_err_category!(
                 "<expression>",
-                primitive
-                    .or(if_expr)
-                    .or(lambda)
-                    .or(proc_call)
-                    .recover_with(nested_delimiters(
-                        Token::Keyword("("),
-                        Token::Keyword(")"),
-                        [],
-                        |_| Expression::Error,
-                    ))
-                    .map_with_span(|expr, span| (expr, span))
-                    .labelled("expression")
+                spanned(primitive.or(if_expr).or(lambda).or(proc_call).recover_with(
+                    nested_delimiters(Token::Keyword("("), Token::Keyword(")"), [], |_| {
+                        Expression::Error
+                    },)
+                ))
+                .labelled("expression")
             )
         });
         let def_proc = enclosed(
             just(Token::Keyword("define"))
-                .ignore_then(enclosed(spanned_ident.then(spanned_ident.repeated())))
+                .ignore_then(enclosed(ident.then(ident.repeated())))
                 .then(proc_body),
         )
         .map_with_span(|((ident, args), body), span| {
@@ -160,15 +157,15 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         });
         let def = map_err_category!(
             "<definition>",
-            def_proc
-                .or(enclosed(
+            spanned(
+                def_proc.or(enclosed(
                     just(Token::Keyword("define"))
-                        .ignore_then(spanned_ident)
+                        .ignore_then(ident)
                         .then(expr.clone())
                 )
                 .map(|(ident, expr)| Definition(ident, expr)))
-                .map_with_span(|def, span| (def, span))
-                .labelled("definition")
+            )
+            .labelled("definition")
         );
         def.repeated()
             .then(expr.repeated().at_least(1))
