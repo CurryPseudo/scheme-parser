@@ -52,6 +52,14 @@ where
     }
 }
 
+impl<'a> Debug for SpanToSource<'a, Spanned<Definition>> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("")
+            .field(&self.replace(&self.0 .0))
+            .field(&&self.1[self.0 .1.clone()] as &dyn Debug)
+            .finish()
+    }
+}
 impl<'a> Debug for SpanToSource<'a, Definition> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_tuple("Definition")

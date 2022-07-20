@@ -1,79 +1,88 @@
 ProcedureBody {
     defs: [
-        Definition(
-            (
-                "a",
-                Source(
+        (
+            Definition(
+                (
                     "a",
-                ),
-            ),
-            (
-                Primitive(
-                    Integer(
-                        12,
+                    Source(
+                        "a",
                     ),
                 ),
-                "12",
+                (
+                    Primitive(
+                        Integer(
+                            12,
+                        ),
+                    ),
+                    "12",
+                ),
             ),
+            "(define a 12)",
         ),
-        Definition(
-            (
-                "one",
-                Source(
+        (
+            Definition(
+                (
                     "one",
+                    Source(
+                        "one",
+                    ),
                 ),
-            ),
-            (
-                Procedure {
-                    args: [],
-                    body: ProcedureBody {
-                        defs: [],
-                        exprs: [],
-                        last_expr: (
-                            Primitive(
-                                Integer(
-                                    1,
+                (
+                    Procedure {
+                        args: [],
+                        body: ProcedureBody {
+                            defs: [],
+                            exprs: [],
+                            last_expr: (
+                                Primitive(
+                                    Integer(
+                                        1,
+                                    ),
                                 ),
+                                "1",
                             ),
-                            "1",
-                        ),
+                        },
                     },
-                },
-                "(define (one) 1)",
-            ),
-        ),
-        Definition(
-            (
-                "id",
-                Source(
-                    "id",
+                    "(define (one) 1)",
                 ),
             ),
-            (
-                Procedure {
-                    args: [
-                        (
-                            "x",
-                            Source(
+            "(define (one) 1)",
+        ),
+        (
+            Definition(
+                (
+                    "id",
+                    Source(
+                        "id",
+                    ),
+                ),
+                (
+                    Procedure {
+                        args: [
+                            (
                                 "x",
-                            ),
-                        ),
-                    ],
-                    body: ProcedureBody {
-                        defs: [],
-                        exprs: [],
-                        last_expr: (
-                            Primitive(
-                                Ident(
+                                Source(
                                     "x",
                                 ),
                             ),
-                            "x",
-                        ),
+                        ],
+                        body: ProcedureBody {
+                            defs: [],
+                            exprs: [],
+                            last_expr: (
+                                Primitive(
+                                    Ident(
+                                        "x",
+                                    ),
+                                ),
+                                "x",
+                            ),
+                        },
                     },
-                },
-                "(define (id x) x)",
+                    "(define (id x) x)",
+                ),
             ),
+            "(define (id x) x)",
         ),
     ],
     exprs: [

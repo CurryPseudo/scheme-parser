@@ -5,7 +5,7 @@ use crate::*;
 
 #[derive(Debug)]
 pub struct ProcedureBody {
-    pub defs: Vec<Definition>,
+    pub defs: Vec<Spanned<Definition>>,
     pub exprs: Vec<Spanned<Expression>>,
     pub last_expr: Spanned<Expression>,
 }
@@ -167,6 +167,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                         .then(expr.clone())
                 )
                 .map(|(ident, expr)| Definition(ident, expr)))
+                .map_with_span(|def, span| (def, span))
                 .labelled("definition")
         );
         def.repeated()

@@ -101,68 +101,74 @@ ProcedureBody {
             ],
             body: ProcedureBody {
                 defs: [
-                    Definition(
-                        (
-                            "z",
-                            Source(
+                    (
+                        Definition(
+                            (
                                 "z",
-                            ),
-                        ),
-                        (
-                            ProcedureCall {
-                                operator: (
-                                    Primitive(
-                                        Ident(
-                                            "x",
-                                        ),
-                                    ),
-                                    "x",
-                                ),
-                                args: [
-                                    (
-                                        Primitive(
-                                            Real {
-                                                numer: 357,
-                                                denom_log10: 2,
-                                            },
-                                        ),
-                                        "3.57",
-                                    ),
-                                ],
-                            },
-                            "(x 3.57)",
-                        ),
-                    ),
-                    Definition(
-                        (
-                            "y",
-                            Source(
-                                "y",
-                            ),
-                        ),
-                        (
-                            ProcedureCall {
-                                operator: (
-                                    Primitive(
-                                        Ident(
-                                            "z",
-                                        ),
-                                    ),
+                                Source(
                                     "z",
                                 ),
-                                args: [
-                                    (
+                            ),
+                            (
+                                ProcedureCall {
+                                    operator: (
                                         Primitive(
-                                            Bool(
-                                                true,
+                                            Ident(
+                                                "x",
                                             ),
                                         ),
-                                        "#t",
+                                        "x",
                                     ),
-                                ],
-                            },
-                            "(z #t)",
+                                    args: [
+                                        (
+                                            Primitive(
+                                                Real {
+                                                    numer: 357,
+                                                    denom_log10: 2,
+                                                },
+                                            ),
+                                            "3.57",
+                                        ),
+                                    ],
+                                },
+                                "(x 3.57)",
+                            ),
                         ),
+                        "(define z (x 3.57))",
+                    ),
+                    (
+                        Definition(
+                            (
+                                "y",
+                                Source(
+                                    "y",
+                                ),
+                            ),
+                            (
+                                ProcedureCall {
+                                    operator: (
+                                        Primitive(
+                                            Ident(
+                                                "z",
+                                            ),
+                                        ),
+                                        "z",
+                                    ),
+                                    args: [
+                                        (
+                                            Primitive(
+                                                Bool(
+                                                    true,
+                                                ),
+                                            ),
+                                            "#t",
+                                        ),
+                                    ],
+                                },
+                                "(z #t)",
+                            ),
+                        ),
+                        "(define y (z #t))",
                     ),
                 ],
                 exprs: [

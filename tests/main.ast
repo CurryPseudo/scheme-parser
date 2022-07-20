@@ -1,85 +1,100 @@
 ProcedureBody {
     defs: [
-        Definition(
-            (
-                "a",
-                Source(
+        (
+            Definition(
+                (
                     "a",
-                ),
-            ),
-            (
-                Primitive(
-                    Integer(
-                        -312,
+                    Source(
+                        "a",
                     ),
                 ),
-                "-312",
+                (
+                    Primitive(
+                        Integer(
+                            -312,
+                        ),
+                    ),
+                    "-312",
+                ),
             ),
+            "(define a -312)",
         ),
-        Definition(
-            (
-                "b",
-                Source(
+        (
+            Definition(
+                (
                     "b",
-                ),
-            ),
-            (
-                Primitive(
-                    Integer(
-                        1235,
+                    Source(
+                        "b",
                     ),
                 ),
-                "1235",
+                (
+                    Primitive(
+                        Integer(
+                            1235,
+                        ),
+                    ),
+                    "1235",
+                ),
             ),
+            "(define b 1235)",
         ),
-        Definition(
-            (
-                "aba",
-                Source(
+        (
+            Definition(
+                (
                     "aba",
+                    Source(
+                        "aba",
+                    ),
+                ),
+                (
+                    Primitive(
+                        Real {
+                            numer: 3126,
+                            denom_log10: 3,
+                        },
+                    ),
+                    "3.126",
                 ),
             ),
-            (
-                Primitive(
-                    Real {
-                        numer: 3126,
-                        denom_log10: 3,
-                    },
-                ),
-                "3.126",
-            ),
+            "(define aba 3.126)",
         ),
-        Definition(
-            (
-                "true",
-                Source(
+        (
+            Definition(
+                (
                     "true",
-                ),
-            ),
-            (
-                Primitive(
-                    Bool(
-                        true,
+                    Source(
+                        "true",
                     ),
                 ),
-                "#t",
+                (
+                    Primitive(
+                        Bool(
+                            true,
+                        ),
+                    ),
+                    "#t",
+                ),
             ),
+            "(define true #t)",
         ),
-        Definition(
-            (
-                "false",
-                Source(
+        (
+            Definition(
+                (
                     "false",
-                ),
-            ),
-            (
-                Primitive(
-                    Bool(
-                        false,
+                    Source(
+                        "false",
                     ),
                 ),
-                "#f",
+                (
+                    Primitive(
+                        Bool(
+                            false,
+                        ),
+                    ),
+                    "#f",
+                ),
             ),
+            "(define false #f)",
         ),
     ],
     exprs: [
