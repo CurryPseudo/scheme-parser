@@ -52,28 +52,11 @@ where
     }
 }
 
-impl<'a> Debug for SpanToSource<'a, Spanned<Definition>> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("")
-            .field(&self.replace(&self.0 .0))
-            .field(&&self.1[self.0 .1.clone()] as &dyn Debug)
-            .finish()
-    }
-}
 impl<'a> Debug for SpanToSource<'a, Definition> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_tuple("Definition")
             .field(&self.replace(&self.0 .0))
             .field(&self.replace(&self.0 .1))
-            .finish()
-    }
-}
-
-impl<'a> Debug for SpanToSource<'a, Spanned<Expression>> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("")
-            .field(&self.replace(&self.0 .0))
-            .field(&&self.1[self.0 .1.clone()] as &dyn Debug)
             .finish()
     }
 }
@@ -106,19 +89,35 @@ impl<'a> Debug for SpanToSource<'a, Expression> {
     }
 }
 
-trait Root {}
-
 #[derive(Debug)]
 struct Source<T>(T);
 
-impl<'a, T: Debug + Root> Debug for SpanToSource<'a, Spanned<T>> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("")
-            .field(&self.0 .0)
-            .field(&Source(&self.1[self.0 .1.clone()]) as &dyn Debug)
-            .finish()
-    }
+macro_rules! impl_non_leaf {
+    ($t: ty) => {
+        impl<'a> Debug for SpanToSource<'a, Spanned<$t>> {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.debug_tuple("")
+                    .field(&self.replace(&self.0 .0))
+                    .field(&Source(&self.1[self.0 .1.clone()]) as &dyn Debug)
+                    .finish()
+            }
+        }
+    };
+}
+macro_rules! impl_leaf {
+    ($t: ty) => {
+        impl<'a> Debug for SpanToSource<'a, Spanned<$t>> {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.debug_tuple("")
+                    .field(&&self.0 .0)
+                    .field(&Source(&self.1[self.0 .1.clone()]) as &dyn Debug)
+                    .finish()
+            }
+        }
+    };
 }
 
-impl Root for Token {}
-impl Root for String {}
+impl_non_leaf!(Definition);
+impl_non_leaf!(Expression);
+impl_leaf!(Token);
+impl_leaf!(String);
