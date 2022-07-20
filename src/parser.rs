@@ -84,6 +84,8 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
         { Token::Primitive(Primitive::Ident(v)) => v }
     };
 
+    let spanned_ident = ident.map_with_span(|ident, span| (ident, span));
+
     let proc_body = recursive(|proc_body| {
         let expr = recursive(|expr| {
             let primitive = select! {
@@ -100,7 +102,7 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
             let lambda = enclosed(
                 just(Token::Keyword("lambda"))
                     .ignore_then(formals)
-                    .then(proc_body.map(Box::new))
+                    .then(proc_body.clone().map(Box::new))
                     .map(|(args, body)| Expression::Procedure { args, body }),
             );
 
@@ -139,15 +141,33 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                     .labelled("expression")
             )
         });
+        let def_proc = enclosed(
+            just(Token::Keyword("define"))
+                .ignore_then(enclosed(spanned_ident.then(spanned_ident.repeated())))
+                .then(proc_body),
+        )
+        .map_with_span(|((ident, args), body), span| {
+            Definition(
+                ident.0,
+                (
+                    Expression::Procedure {
+                        args,
+                        body: Box::new(body),
+                    },
+                    span,
+                ),
+            )
+        });
         let def = map_err_category!(
             "<definition>",
-            enclosed(
-                just(Token::Keyword("define"))
-                    .ignore_then(ident)
-                    .then(expr.clone())
-            )
-            .map(|(ident, expr)| Definition(ident, expr))
-            .labelled("definition")
+            def_proc
+                .or(enclosed(
+                    just(Token::Keyword("define"))
+                        .ignore_then(ident)
+                        .then(expr.clone())
+                )
+                .map(|(ident, expr)| Definition(ident, expr)))
+                .labelled("definition")
         );
         def.repeated()
             .then(expr.repeated().at_least(1))

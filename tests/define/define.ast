@@ -11,6 +11,55 @@ ProcedureBody {
                 "12",
             ),
         ),
+        Definition(
+            "one",
+            (
+                Procedure {
+                    args: [],
+                    body: ProcedureBody {
+                        defs: [],
+                        exprs: [],
+                        last_expr: (
+                            Primitive(
+                                Integer(
+                                    1,
+                                ),
+                            ),
+                            "1",
+                        ),
+                    },
+                },
+                "(define (one) 1)",
+            ),
+        ),
+        Definition(
+            "id",
+            (
+                Procedure {
+                    args: [
+                        (
+                            "x",
+                            Source(
+                                "x",
+                            ),
+                        ),
+                    ],
+                    body: ProcedureBody {
+                        defs: [],
+                        exprs: [],
+                        last_expr: (
+                            Primitive(
+                                Ident(
+                                    "x",
+                                ),
+                            ),
+                            "x",
+                        ),
+                    },
+                },
+                "(define (id x) x)",
+            ),
+        ),
     ],
     exprs: [
         (
