@@ -14,16 +14,16 @@ ProcedureBody {
     ],
     exprs: [
         (
-            ProcedureCall(
-                [
-                    (
-                        Primitive(
-                            Ident(
-                                "defineb",
-                            ),
+            ProcedureCall {
+                operator: (
+                    Primitive(
+                        Ident(
+                            "defineb",
                         ),
-                        "defineb",
                     ),
+                    "defineb",
+                ),
+                args: [
                     (
                         Primitive(
                             Integer(
@@ -33,7 +33,7 @@ ProcedureBody {
                         "34",
                     ),
                 ],
-            ),
+            },
             "(defineb 34)",
         ),
         (
@@ -54,18 +54,17 @@ ProcedureBody {
         ),
     ],
     last_expr: (
-        ProcedureCall(
-            [
-                (
-                    Primitive(
-                        Ident(
-                            "asdf",
-                        ),
+        ProcedureCall {
+            operator: (
+                Primitive(
+                    Ident(
+                        "asdf",
                     ),
-                    "asdf",
                 ),
-            ],
-        ),
+                "asdf",
+            ),
+            args: [],
+        },
         "(asdf)",
     ),
 }

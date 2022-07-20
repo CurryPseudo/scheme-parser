@@ -79,16 +79,16 @@ ProcedureBody {
                     Definition(
                         "z",
                         (
-                            ProcedureCall(
-                                [
-                                    (
-                                        Primitive(
-                                            Ident(
-                                                "x",
-                                            ),
+                            ProcedureCall {
+                                operator: (
+                                    Primitive(
+                                        Ident(
+                                            "x",
                                         ),
-                                        "x",
                                     ),
+                                    "x",
+                                ),
+                                args: [
                                     (
                                         Primitive(
                                             Real {
@@ -99,23 +99,23 @@ ProcedureBody {
                                         "3.57",
                                     ),
                                 ],
-                            ),
+                            },
                             "(x 3.57)",
                         ),
                     ),
                     Definition(
                         "y",
                         (
-                            ProcedureCall(
-                                [
-                                    (
-                                        Primitive(
-                                            Ident(
-                                                "z",
-                                            ),
+                            ProcedureCall {
+                                operator: (
+                                    Primitive(
+                                        Ident(
+                                            "z",
                                         ),
-                                        "z",
                                     ),
+                                    "z",
+                                ),
+                                args: [
                                     (
                                         Primitive(
                                             Bool(
@@ -125,23 +125,23 @@ ProcedureBody {
                                         "#t",
                                     ),
                                 ],
-                            ),
+                            },
                             "(z #t)",
                         ),
                     ),
                 ],
                 exprs: [
                     (
-                        ProcedureCall(
-                            [
-                                (
-                                    Primitive(
-                                        Ident(
-                                            "x",
-                                        ),
+                        ProcedureCall {
+                            operator: (
+                                Primitive(
+                                    Ident(
+                                        "x",
                                     ),
-                                    "x",
                                 ),
+                                "x",
+                            ),
+                            args: [
                                 (
                                     Primitive(
                                         Integer(
@@ -159,7 +159,7 @@ ProcedureBody {
                                     "z",
                                 ),
                             ],
-                        ),
+                        },
                         "(x -1235 z)",
                     ),
                 ],

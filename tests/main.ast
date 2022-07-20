@@ -59,16 +59,16 @@ ProcedureBody {
     ],
     exprs: [
         (
-            ProcedureCall(
-                [
-                    (
-                        Primitive(
-                            Ident(
-                                "+",
-                            ),
+            ProcedureCall {
+                operator: (
+                    Primitive(
+                        Ident(
+                            "+",
                         ),
-                        "+",
                     ),
+                    "+",
+                ),
+                args: [
                     (
                         Primitive(
                             Ident(
@@ -86,21 +86,21 @@ ProcedureBody {
                         "313",
                     ),
                 ],
-            ),
+            },
             "(+ a 313)",
         ),
     ],
     last_expr: (
-        ProcedureCall(
-            [
-                (
-                    Primitive(
-                        Ident(
-                            "-",
-                        ),
+        ProcedureCall {
+            operator: (
+                Primitive(
+                    Ident(
+                        "-",
                     ),
-                    "-",
                 ),
+                "-",
+            ),
+            args: [
                 (
                     Primitive(
                         Ident(
@@ -118,7 +118,7 @@ ProcedureBody {
                     "ada",
                 ),
             ],
-        ),
+        },
         "(-   b ada)",
     ),
 }

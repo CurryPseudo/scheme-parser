@@ -1,0 +1,7 @@
+Error: Unexpected token in input while parsing expression, expected <expression>, if, lambda
+   ╭─[tests/procedure_call/empty.scm:1:2]
+   │
+ 1 │ ()
+   ·  ┬  
+   ·  ╰── Unexpected token )
+───╯

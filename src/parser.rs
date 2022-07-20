@@ -17,7 +17,10 @@ pub struct Definition(pub String, pub Spanned<Expression>);
 
 #[derive(Debug, From)]
 pub enum Expression {
-    ProcedureCall(Vec<Spanned<Expression>>),
+    ProcedureCall {
+        operator: Box<Spanned<Expression>>,
+        args: Vec<Spanned<Expression>>,
+    },
     Primitive(Primitive),
     Procedure {
         /// Arguments
@@ -110,11 +113,12 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                 alter: alter.map(Box::new),
             });
 
-            let proc_call = enclosed(
-                expr.repeated()
-                    .collect::<Vec<_>>()
-                    .map(Expression::ProcedureCall),
-            )
+            let proc_call = enclosed(expr.clone().then(expr.repeated()).map(|(operator, args)| {
+                Expression::ProcedureCall {
+                    operator: Box::new(operator),
+                    args,
+                }
+            }))
             .labelled("procedure call");
             map_err_category!(
                 "<expression>",

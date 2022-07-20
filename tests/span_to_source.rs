@@ -73,9 +73,10 @@ impl<'a> Debug for SpanToSource<'a, Spanned<Expression>> {
 impl<'a> Debug for SpanToSource<'a, Expression> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.0 {
-            Expression::ProcedureCall(exprs) => f
-                .debug_tuple("ProcedureCall")
-                .field(&self.replace(exprs))
+            Expression::ProcedureCall { operator, args } => f
+                .debug_struct("ProcedureCall")
+                .field("operator", &self.replace(operator))
+                .field("args", &self.replace(args))
                 .finish(),
             Expression::Procedure { args, body } => f
                 .debug_struct("Procedure")
