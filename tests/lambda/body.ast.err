@@ -1,4 +1,4 @@
-Error: Unexpected token in input while parsing expression, expected <expression>, if, lambda
+Error: Unexpected token in input while parsing expression, expected <expression>, if, lambda, set!
    ╭─[tests/lambda/body.scm:4:6]
    │
  4 │     (define z x)

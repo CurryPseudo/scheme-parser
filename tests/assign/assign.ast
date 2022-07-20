@@ -1,0 +1,100 @@
+ProcedureBody {
+    defs: [
+        (
+            Definition(
+                (
+                    "a",
+                    Source(
+                        "a",
+                    ),
+                ),
+                (
+                    Primitive(
+                        Real {
+                            numer: 15,
+                            denom_log10: 1,
+                        },
+                    ),
+                    Source(
+                        "1.5",
+                    ),
+                ),
+            ),
+            Source(
+                "(define a 1.5)",
+            ),
+        ),
+        (
+            Definition(
+                (
+                    "b",
+                    Source(
+                        "b",
+                    ),
+                ),
+                (
+                    Primitive(
+                        Integer(
+                            3,
+                        ),
+                    ),
+                    Source(
+                        "3",
+                    ),
+                ),
+            ),
+            Source(
+                "(define b 3)",
+            ),
+        ),
+    ],
+    exprs: [
+        (
+            Assignment(
+                (
+                    "a",
+                    Source(
+                        "a",
+                    ),
+                ),
+                (
+                    Primitive(
+                        Real {
+                            numer: 5,
+                            denom_log10: 1,
+                        },
+                    ),
+                    Source(
+                        "0.5",
+                    ),
+                ),
+            ),
+            Source(
+                "(set! a 0.5)",
+            ),
+        ),
+    ],
+    last_expr: (
+        Assignment(
+            (
+                "b",
+                Source(
+                    "b",
+                ),
+            ),
+            (
+                Primitive(
+                    Integer(
+                        -2,
+                    ),
+                ),
+                Source(
+                    "-2",
+                ),
+            ),
+        ),
+        Source(
+            "(set! b -2)",
+        ),
+    ),
+}

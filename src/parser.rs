@@ -38,6 +38,7 @@ pub enum Expression {
         /// Alternative
         alter: Option<Box<Spanned<Expression>>>,
     },
+    Assignment(Spanned<String>, Box<Spanned<Expression>>),
     Error,
 }
 
@@ -107,7 +108,8 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                     .ignore_then(formals)
                     .then(proc_body.clone().map(Box::new))
                     .map(|(args, body)| Expression::Procedure { args, body }),
-            );
+            )
+            .labelled("lambda");
 
             let if_expr = enclosed(
                 just(Token::Keyword("if"))
@@ -121,20 +123,32 @@ fn parser() -> impl Parser<Token, Program, Error = Simple<Token>> {
                 alter: alter.map(Box::new),
             });
 
-            let proc_call = enclosed(expr.clone().then(expr.repeated()).map(|(operator, args)| {
-                Expression::ProcedureCall {
+            let proc_call = enclosed(expr.clone().then(expr.clone().repeated()).map(
+                |(operator, args)| Expression::ProcedureCall {
                     operator: Box::new(operator),
                     args,
-                }
-            }))
+                },
+            ))
             .labelled("procedure call");
+
+            let assign = enclosed(just(Token::Keyword("set!")).ignore_then(ident).then(expr))
+                .map(|(ident, expr)| Expression::Assignment(ident, Box::new(expr)));
+
             map_err_category!(
                 "<expression>",
-                spanned(primitive.or(if_expr).or(lambda).or(proc_call).recover_with(
-                    nested_delimiters(Token::Keyword("("), Token::Keyword(")"), [], |_| {
-                        Expression::Error
-                    },)
-                ))
+                spanned(
+                    primitive
+                        .or(if_expr)
+                        .or(lambda)
+                        .or(assign)
+                        .or(proc_call)
+                        .recover_with(nested_delimiters(
+                            Token::Keyword("("),
+                            Token::Keyword(")"),
+                            [],
+                            |_| { Expression::Error },
+                        ))
+                )
                 .labelled("expression")
             )
         });

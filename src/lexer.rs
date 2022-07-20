@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::*;
-use chumsky::prelude::*;
+use chumsky::{prelude::*, text::Character};
 use derive_more::From;
 pub use error::*;
 use num::{traits::Pow, BigInt, Integer, Signed, Zero};
@@ -52,23 +52,40 @@ impl Display for Token {
     }
 }
 
+fn keyword(keyword: &'static str) -> impl Parser<char, Token, Error = Simple<char>> {
+    filter(|c: &char| c.to_char().is_ascii_alphabetic() || c.to_char() == '_')
+        .map(Some)
+        .chain::<char, Vec<_>, _>(
+            filter(|c: &char| {
+                c.to_char().is_ascii_alphanumeric() || c.to_char() == '_' || c.to_char() == '!'
+            })
+            .repeated(),
+        )
+        .collect()
+        .try_map(move |s: String, span| {
+            if s == keyword {
+                Ok(())
+            } else {
+                Err(Simple::<char>::expected_input_found(span, None, None))
+            }
+        })
+        .map(move |_| Token::Keyword(keyword))
+        .labelled(keyword)
+}
+
 pub fn lexer() -> impl Parser<char, Vec<Spanned<Token>>, Error = Simple<char>> {
     macro_rules! char {
         ($s: expr) => {
             just($s).map(|_| Token::Keyword($s)).labelled($s)
         };
     }
-    macro_rules! keyword {
-        ($s: expr) => {
-            text::keyword($s).map(|_| Token::Keyword($s)).labelled($s)
-        };
-    }
 
     let keyword = char!("(")
         .or(char!(")"))
-        .or(keyword!("define"))
-        .or(keyword!("lambda"))
-        .or(keyword!("if"));
+        .or(keyword("define"))
+        .or(keyword("lambda"))
+        .or(keyword("if"))
+        .or(keyword("set!"));
     let boolean = choice((
         just("#t").to(Primitive::Bool(true).into()),
         just("#f").to(Primitive::Bool(false).into()),

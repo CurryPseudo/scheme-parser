@@ -1,4 +1,4 @@
-Error: Unexpected token in input while parsing expression, expected ), <identifier>
+Error: Unexpected token in input while parsing lambda, expected ), <identifier>
    ╭─[tests/lambda/arg.scm:1:12]
    │
  1 │ (lambda (a 3.5)
