@@ -1,5 +1,5 @@
 Error: Unclosed delimiter ( while parsing expression
-   ╭─[tests/procedure_call/procedure_call_unclosed_right.scm:1:6]
+   ╭─[tests/procedure_call/unclosed_right.scm:1:6]
    │
  1 │ (3132
    · ┬    ┬  
@@ -8,7 +8,7 @@ Error: Unclosed delimiter ( while parsing expression
    ·      ╰── Must be closed before this end of file
 ───╯
 Error: Unexpected end of input while parsing procedure call, expected <expression>
-   ╭─[tests/procedure_call/procedure_call_unclosed_right.scm:1:6]
+   ╭─[tests/procedure_call/unclosed_right.scm:1:6]
    │
  1 │ (3132
    ·      ┬  
