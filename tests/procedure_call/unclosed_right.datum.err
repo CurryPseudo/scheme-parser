@@ -1,0 +1,9 @@
+Error: Unclosed delimiter (
+   ╭─[tests/procedure_call/unclosed_right.scm:1:6]
+   │
+ 1 │ (3132
+   · ┬    ┬  
+   · ╰─────── Unclosed delimiter (
+   ·      │  
+   ·      ╰── Must be closed before this end of file
+───╯

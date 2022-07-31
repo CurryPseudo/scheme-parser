@@ -97,20 +97,48 @@ fn regression() {
             }
         };
         if let Some(tokens) = tokens {
-            let mut error_path = path.clone();
-            error_path.set_extension("ast.err");
-            let mut ast_path = path.clone();
-            ast_path.set_extension("ast");
-            match scheme_parser::Parser::default().parse_tokens(&tokens, &input, &path_str) {
-                Ok(program) => {
-                    let content = format!("{:#?}", SpanToSource(&program, &input));
-                    assert_eq_or_override(&ast_path, &content, &mut regression_errors);
-                    assert_non_exist(&error_path, &mut regression_errors);
+            let ok = {
+                let mut error_path = path.clone();
+                error_path.set_extension("datum.err");
+                let mut datum_path = path.clone();
+                datum_path.set_extension("datum");
+                match scheme_parser::transformer::datumize(&tokens, &input, &path_str) {
+                    Ok(program) => {
+                        let content = format!("{:#?}", SpanToSource(&program, &input));
+                        assert_eq_or_override(&datum_path, &content, &mut regression_errors);
+                        assert_non_exist(&error_path, &mut regression_errors);
+                        true
+                    }
+                    Err(error) => {
+                        assert_non_exist(&datum_path, &mut regression_errors);
+                        let content = error.to_string();
+                        assert_eq_or_override(&error_path, &content, &mut regression_errors);
+                        false
+                    }
                 }
-                Err(error) => {
+            };
+            {
+                let mut error_path = path.clone();
+                error_path.set_extension("ast.err");
+                let mut ast_path = path.clone();
+                ast_path.set_extension("ast");
+                if ok {
+                    match scheme_parser::Parser::default().parse_tokens(&tokens, &input, &path_str)
+                    {
+                        Ok(program) => {
+                            let content = format!("{:#?}", SpanToSource(&program, &input));
+                            assert_eq_or_override(&ast_path, &content, &mut regression_errors);
+                            assert_non_exist(&error_path, &mut regression_errors);
+                        }
+                        Err(error) => {
+                            assert_non_exist(&ast_path, &mut regression_errors);
+                            let content = error.to_string();
+                            assert_eq_or_override(&error_path, &content, &mut regression_errors);
+                        }
+                    }
+                } else {
+                    assert_non_exist(&error_path, &mut regression_errors);
                     assert_non_exist(&ast_path, &mut regression_errors);
-                    let content = error.to_string();
-                    assert_eq_or_override(&error_path, &content, &mut regression_errors);
                 }
             }
         }

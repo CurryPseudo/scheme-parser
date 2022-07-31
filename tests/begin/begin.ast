@@ -1,0 +1,70 @@
+ProcedureBody {
+    defs: [],
+    exprs: [
+        (
+            Primitive(
+                Ident(
+                    "foo",
+                ),
+            ),
+            Source(
+                "foo",
+            ),
+        ),
+    ],
+    last_expr: (
+        ProcedureCall {
+            operator: (
+                Procedure {
+                    args: [],
+                    body: ProcedureBody {
+                        defs: [
+                            (
+                                Definition(
+                                    (
+                                        "foobar",
+                                        Source(
+                                            "foobar",
+                                        ),
+                                    ),
+                                    (
+                                        Primitive(
+                                            Real {
+                                                numer: 53,
+                                                denom_log10: 1,
+                                            },
+                                        ),
+                                        Source(
+                                            "5.3",
+                                        ),
+                                    ),
+                                ),
+                                Source(
+                                    "(define foobar 5.3)",
+                                ),
+                            ),
+                        ],
+                        exprs: [],
+                        last_expr: (
+                            Primitive(
+                                Ident(
+                                    "foobar",
+                                ),
+                            ),
+                            Source(
+                                "foobar",
+                            ),
+                        ),
+                    },
+                },
+                Source(
+                    "(begin \n  (define foobar 5.3)\n  foobar\n)",
+                ),
+            ),
+            args: [],
+        },
+        Source(
+            "(begin \n  (define foobar 5.3)\n  foobar\n)",
+        ),
+    ),
+}

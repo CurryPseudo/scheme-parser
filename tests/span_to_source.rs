@@ -95,6 +95,15 @@ impl<'a> Debug for SpanToSource<'a, Expression> {
     }
 }
 
+impl<'a> Debug for SpanToSource<'a, Datum> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.0 {
+            Datum::Primitive(_) | Datum::Error | Datum::Keyword(_) => self.0.fmt(f),
+            Datum::List(list) => f.debug_tuple("List").field(&self.replace(list)).finish(),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct Source<T>(T);
 
@@ -125,5 +134,6 @@ macro_rules! impl_leaf {
 
 impl_non_leaf!(Definition);
 impl_non_leaf!(Expression);
+impl_non_leaf!(Datum);
 impl_leaf!(Token);
 impl_leaf!(String);

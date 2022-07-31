@@ -1,0 +1,47 @@
+[
+    (
+        List(
+            [
+                (
+                    Keyword(
+                        "define",
+                    ),
+                    Source(
+                        "define",
+                    ),
+                ),
+                (
+                    List(
+                        [],
+                    ),
+                    Source(
+                        "()",
+                    ),
+                ),
+                (
+                    Primitive(
+                        Ident(
+                            "foo",
+                        ),
+                    ),
+                    Source(
+                        "foo",
+                    ),
+                ),
+            ],
+        ),
+        Source(
+            "(define () foo)",
+        ),
+    ),
+    (
+        Primitive(
+            Ident(
+                "foo",
+            ),
+        ),
+        Source(
+            "foo",
+        ),
+    ),
+]

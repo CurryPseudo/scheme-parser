@@ -1,0 +1,79 @@
+[
+    (
+        Primitive(
+            Ident(
+                "foo",
+            ),
+        ),
+        Source(
+            "foo",
+        ),
+    ),
+    (
+        List(
+            [
+                (
+                    Primitive(
+                        Ident(
+                            "begin",
+                        ),
+                    ),
+                    Source(
+                        "begin",
+                    ),
+                ),
+                (
+                    List(
+                        [
+                            (
+                                Keyword(
+                                    "define",
+                                ),
+                                Source(
+                                    "define",
+                                ),
+                            ),
+                            (
+                                Primitive(
+                                    Ident(
+                                        "foobar",
+                                    ),
+                                ),
+                                Source(
+                                    "foobar",
+                                ),
+                            ),
+                            (
+                                Primitive(
+                                    Real {
+                                        numer: 53,
+                                        denom_log10: 1,
+                                    },
+                                ),
+                                Source(
+                                    "5.3",
+                                ),
+                            ),
+                        ],
+                    ),
+                    Source(
+                        "(define foobar 5.3)",
+                    ),
+                ),
+                (
+                    Primitive(
+                        Ident(
+                            "foobar",
+                        ),
+                    ),
+                    Source(
+                        "foobar",
+                    ),
+                ),
+            ],
+        ),
+        Source(
+            "(begin \n  (define foobar 5.3)\n  foobar\n)",
+        ),
+    ),
+]

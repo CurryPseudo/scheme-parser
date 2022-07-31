@@ -1,9 +1,10 @@
 use derive_more::{Display, From};
 
-use crate::*;
+use crate::{transformer::*, *};
 
 pub(super) mod chumsky {
     use chumsky::{combinator::MapWithSpan, prelude::*};
+    use std::hash::Hash;
     use std::ops::Range;
 
     use crate::ast::*;
@@ -14,14 +15,13 @@ pub(super) mod chumsky {
         parser.delimited_by(just(Token::Keyword("(")), just(Token::Keyword(")")))
     }
 
-    fn spanned<T, I: chumsky::Parser<Token, T, Error = Simple<Token>>>(
+    fn spanned<S: Clone + Hash + Eq, T, I: chumsky::Parser<S, T, Error = Simple<S>>>(
         parser: I,
     ) -> MapWithSpan<I, impl Fn(T, Range<usize>) -> (T, Range<usize>) + Clone + Copy, T> {
         parser.map_with_span(|t, span| (t, span))
     }
 
-    pub fn parser() -> impl chumsky::Parser<Token, Program, Error = Simple<Token>> {
-        macro_rules! select {
+    macro_rules! select {
         ($category: literal, {$($p:pat $(if $guard:expr)? => $out:expr),+ $(,)?}) => ({
             filter_map(move |span: std::ops::Range<usize>, x| match x {
                 $($p $(if $guard)? => ::core::result::Result::Ok($out)),+,
@@ -33,6 +33,8 @@ pub(super) mod chumsky {
             })
         });
     }
+
+    pub fn parser() -> impl chumsky::Parser<Token, Program, Error = Simple<Token>> {
         macro_rules! map_err_category {
             ($category: literal, $parser: expr) => {
                 $parser.map_err(|e| {
@@ -169,8 +171,17 @@ pub(super) mod chumsky {
     }
 }
 
-#[derive(Default)]
-pub struct Parser {}
+pub struct Parser {
+    transformers: Vec<Box<dyn Transformer>>,
+}
+
+impl Default for Parser {
+    fn default() -> Self {
+        Self {
+            transformers: vec![Box::new(crate::transformer::builtin::Begin)],
+        }
+    }
+}
 
 #[derive(From, Display)]
 pub enum TokenizeOrParseError<'a> {
@@ -198,11 +209,13 @@ impl Parser {
         source_path: &'a str,
     ) -> Result<Program, TokenizeOrParseError<'a>> {
         use ::chumsky::Parser as _;
-        let len = source.len();
+        let (tokens, mut new_transformers) =
+            expansion(&self.transformers, &tokens, source, source_path)?;
+        self.transformers.append(&mut new_transformers);
         chumsky::parser()
             .parse(::chumsky::Stream::from_iter(
-                len..len + 1,
-                tokens.iter().cloned(),
+                source.len()..source.len() + 1,
+                tokens.into_iter(),
             ))
             .map_err(|e| {
                 ParseError {
