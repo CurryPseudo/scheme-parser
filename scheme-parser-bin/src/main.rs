@@ -1,6 +1,7 @@
 use std::fs::read_to_string;
 
 use clap::Parser;
+use scheme_parser::datumize;
 
 #[derive(Parser)]
 struct Args {
@@ -9,6 +10,8 @@ struct Args {
     non_colorful: bool,
     #[clap(short, long)]
     token: bool,
+    #[clap(short, long)]
+    datum: bool,
 }
 fn main() {
     let args = Args::parse();
@@ -18,6 +21,18 @@ fn main() {
             Ok(tokens) => {
                 println!("{:#?}", tokens);
             }
+            Err(error) => {
+                print!("{}", error.with_color(!args.non_colorful));
+            }
+        }
+    } else if args.datum {
+        match scheme_parser::tokenize(&file_content, &args.file_name) {
+            Ok(tokens) => match datumize(&tokens, &file_content, &args.file_name) {
+                Ok(datums) => {
+                    println!("{:#?}", datums);
+                }
+                Err(error) => print!("{}", error.with_color(!args.non_colorful)),
+            },
             Err(error) => {
                 print!("{}", error.with_color(!args.non_colorful));
             }
