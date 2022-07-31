@@ -1,0 +1,59 @@
+[
+    (
+        List(
+            [
+                (
+                    Keyword(
+                        "lambda",
+                    ),
+                    Source(
+                        "lambda",
+                    ),
+                ),
+                (
+                    List(
+                        [
+                            (
+                                Primitive(
+                                    Ident(
+                                        "a",
+                                    ),
+                                ),
+                                Source(
+                                    "a",
+                                ),
+                            ),
+                            (
+                                Primitive(
+                                    Real {
+                                        numer: 35,
+                                        denom_log10: 1,
+                                    },
+                                ),
+                                Source(
+                                    "3.5",
+                                ),
+                            ),
+                        ],
+                    ),
+                    Source(
+                        "(a 3.5)",
+                    ),
+                ),
+                (
+                    Primitive(
+                        Ident(
+                            "x",
+                        ),
+                    ),
+                    Source(
+                        "x",
+                    ),
+                ),
+            ],
+        ),
+        Source(
+            "(lambda (a 3.5)\n    x\n)",
+        ),
+    ),
+]

@@ -1,0 +1,9 @@
+Error: Unclosed delimiter ( while parsing list
+   ╭─[tests/procedure_call/unclosed_right1.scm:1:10]
+   │
+ 1 │ (3132 ( a
+   ·       ┬  ┬  
+   ·       ╰───── Unclosed delimiter (
+   ·          │  
+   ·          ╰── Must be closed before this end of file
+───╯

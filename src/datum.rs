@@ -20,3 +20,19 @@ impl Display for Datum {
         }
     }
 }
+
+pub trait IntoTokens {
+    fn into_tokens(self) -> Vec<Spanned<Token>>;
+}
+
+impl IntoTokens for Spanned<Datum> {
+    fn into_tokens(self) -> Vec<Spanned<Token>> {
+        todo!()
+    }
+}
+
+impl IntoTokens for Vec<Spanned<Datum>> {
+    fn into_tokens(self) -> Vec<Spanned<Token>> {
+        todo!()
+    }
+}

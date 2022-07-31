@@ -4,15 +4,14 @@ use crate::*;
 
 pub(super) mod chumsky {
     use chumsky::{combinator::MapWithSpan, prelude::*};
-    use derive_more::From;
+    //use derive_more::From;
     use std::hash::Hash;
     use std::ops::Range;
 
     use crate::ast::*;
     use crate::token::*;
-    use crate::Datum;
-    use crate::Spanned;
-    use crate::Transfomer;
+    //use crate::Datum;
+    //use crate::Spanned;
     fn enclosed<T>(
         parser: impl chumsky::Parser<Token, T, Error = Simple<Token>>,
     ) -> impl chumsky::Parser<Token, T, Error = Simple<Token>> {
@@ -25,18 +24,18 @@ pub(super) mod chumsky {
         parser.map_with_span(|t, span| (t, span))
     }
 
-    macro_rules! select_datum {
-        ($category: literal, {$($p:pat $(if $guard:expr)? => $out:expr),+ $(,)?}) => ({
-            filter_map(move |span: std::ops::Range<usize>, x| match x {
-                $($p $(if $guard)? => ::core::result::Result::Ok($out)),+,
-                other => Err(Simple::expected_input_found(
-                    span,
-                    Some(Some(Datum::Keyword($category))),
-                    Some(other),
-                )),
-            })
-        });
-    }
+    //macro_rules! select_datum {
+    //    ($category: literal, {$($p:pat $(if $guard:expr)? => $out:expr),+ $(,)?}) => ({
+    //        filter_map(move |span: std::ops::Range<usize>, x| match x {
+    //            $($p $(if $guard)? => ::core::result::Result::Ok($out)),+,
+    //            other => Err(Simple::expected_input_found(
+    //                span,
+    //                Some(Some(Datum::Keyword($category))),
+    //                Some(other),
+    //            )),
+    //        })
+    //    });
+    //}
     macro_rules! select {
         ($category: literal, {$($p:pat $(if $guard:expr)? => $out:expr),+ $(,)?}) => ({
             filter_map(move |span: std::ops::Range<usize>, x| match x {
@@ -48,37 +47,6 @@ pub(super) mod chumsky {
                 )),
             })
         });
-    }
-    pub fn datums() -> impl chumsky::Parser<Token, Vec<Spanned<Datum>>, Error = Simple<Token>> {
-        recursive(|datum| {
-            let keyword = select! {
-                "<keyword>",
-                {
-                    Token::Keyword(keyword)  if keyword != "(" && keyword != ")" => Datum::Keyword(keyword),
-                }
-            };
-            let primitive = select! {
-                "<primitive>",
-                {
-                    Token::Primitive(p) => Datum::Primitive(p),
-                }
-            };
-            let list = enclosed(datum.repeated())
-                .map(|datums| Datum::List(datums))
-                .labelled("list");
-            spanned(
-                list.or(keyword)
-                    .or(primitive)
-                    .recover_with(nested_delimiters(
-                        Token::Keyword("("),
-                        Token::Keyword(")"),
-                        [],
-                        |_| Datum::Error,
-                    )),
-            )
-        })
-        .repeated()
-        .then_ignore(end())
     }
 
     //pub fn datum_parser() -> impl chumsky::Parser<Datum, Program, Error = Simple<Datum>> {
@@ -228,9 +196,7 @@ pub(super) mod chumsky {
     //    proc_body.labelled("program").then_ignore(end())
     //}
 
-    pub fn parser(
-        transformer: &mut Vec<Box<dyn Transfomer>>,
-    ) -> impl chumsky::Parser<Token, Program, Error = Simple<Token>> {
+    pub fn parser() -> impl chumsky::Parser<Token, Program, Error = Simple<Token>> {
         macro_rules! map_err_category {
             ($category: literal, $parser: expr) => {
                 $parser.map_err(|e| {
@@ -369,7 +335,7 @@ pub(super) mod chumsky {
 
 #[derive(Default)]
 pub struct Parser {
-    transformers: Vec<Box<dyn Transfomer>>,
+    _transformers: Vec<Box<dyn Transformer>>,
 }
 
 #[derive(From, Display)]
@@ -394,28 +360,6 @@ impl<'a> TokenizeOrParseError<'a> {
             TokenizeOrParseError::Parse(e) => TokenizeOrParseError::Parse(e.with_color(colorful)),
         }
     }
-}
-
-pub fn datumize<'a>(
-    tokens: &[Spanned<Token>],
-    source: &'a str,
-    source_path: &'a str,
-) -> Result<Vec<Spanned<Datum>>, ParseError<'a, Token>> {
-    use ::chumsky::Parser as _;
-    let len = source.len();
-    chumsky::datums()
-        .parse(::chumsky::Stream::from_iter(
-            len..len + 1,
-            tokens.iter().cloned(),
-        ))
-        .map_err(|e| ParseError {
-            source,
-            source_path,
-            simple: e,
-            type_name: "token",
-            colorful: false,
-            display_every_expected: true,
-        })
 }
 
 impl Parser {
@@ -453,7 +397,7 @@ impl Parser {
         use ::chumsky::Parser as _;
         //let datums = datumize(tokens, source, source_path)?;
         //self.parse_datums(tokens, &datums, source, source_path)
-        chumsky::parser(&mut self.transformers)
+        chumsky::parser()
             .parse(::chumsky::Stream::from_iter(
                 source.len()..source.len() + 1,
                 tokens.iter().cloned(),
@@ -476,6 +420,9 @@ impl Parser {
         source_path: &'a str,
     ) -> Result<Program, TokenizeOrParseError<'a>> {
         let tokens = tokenize(source, source_path)?;
+        //let (tokens, mut new_transformers) =
+        //    expansion(&self.transformers, &tokens, source, source_path)?;
+        //self.transformers.append(&mut new_transformers);
         self.parse_tokens(&tokens, source, source_path)
     }
 }

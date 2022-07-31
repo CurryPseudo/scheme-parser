@@ -1,0 +1,117 @@
+[
+    (
+        Primitive(
+            Ident(
+                "asdf",
+            ),
+        ),
+        Source(
+            "asdf",
+        ),
+    ),
+    (
+        Primitive(
+            Integer(
+                12345,
+            ),
+        ),
+        Source(
+            "12345",
+        ),
+    ),
+    (
+        Primitive(
+            Real {
+                numer: 3561245,
+                denom_log10: 6,
+            },
+        ),
+        Source(
+            "3.561245",
+        ),
+    ),
+    (
+        Primitive(
+            Real {
+                numer: 12316561231323,
+                denom_log10: 2,
+            },
+        ),
+        Source(
+            "123165612313.23",
+        ),
+    ),
+    (
+        Primitive(
+            Real {
+                numer: 1298312986419284719284719283419285192783912873192873198274198,
+                denom_log10: 32,
+            },
+        ),
+        Source(
+            "12983129864192847192847192834.19285192783912873192873198274198",
+        ),
+    ),
+    (
+        Primitive(
+            Integer(
+                -1928379127849182749182739127839128731928739182749182749182749812,
+            ),
+        ),
+        Source(
+            "-1928379127849182749182739127839128731928739182749182749182749812",
+        ),
+    ),
+    (
+        Primitive(
+            Integer(
+                3154,
+            ),
+        ),
+        Source(
+            "+3154",
+        ),
+    ),
+    (
+        Primitive(
+            Real {
+                numer: 315124123,
+                denom_log10: 4,
+            },
+        ),
+        Source(
+            "+31512.4123",
+        ),
+    ),
+    (
+        Primitive(
+            Real {
+                numer: -316167,
+                denom_log10: 4,
+            },
+        ),
+        Source(
+            "-31.6167",
+        ),
+    ),
+    (
+        Primitive(
+            Bool(
+                true,
+            ),
+        ),
+        Source(
+            "#t",
+        ),
+    ),
+    (
+        Primitive(
+            Bool(
+                false,
+            ),
+        ),
+        Source(
+            "#f",
+        ),
+    ),
+]
