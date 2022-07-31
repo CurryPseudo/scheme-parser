@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 
 use clap::Parser;
-use scheme_parser::datumize;
+use scheme_parser::transformer::datumize;
 
 #[derive(Parser)]
 struct Args {

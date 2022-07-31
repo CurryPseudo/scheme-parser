@@ -1,10 +1,11 @@
+pub mod builtin;
 use ::chumsky::prelude::*;
 use chumsky::combinator::MapWithSpan;
 use std::{hash::Hash, ops::Range};
 
 use crate::{Datum, IntoTokens, ParseError, Spanned, Token};
 pub trait Transformer {
-    fn transform(&self, datum: Spanned<Datum>) -> Spanned<Datum>;
+    fn transform(&self, datum: &mut Spanned<Datum>);
 }
 
 fn enclosed<T>(
@@ -82,11 +83,16 @@ pub fn datumize<'a>(
         })
 }
 pub fn expansion<'a>(
-    _transformers: &[Box<dyn Transformer>],
+    transformers: &[Box<dyn Transformer>],
     tokens: &[Spanned<Token>],
     source: &'a str,
     source_path: &'a str,
 ) -> Result<(Vec<Spanned<Token>>, Vec<Box<dyn Transformer>>), ParseError<'a, Token>> {
-    let datums = datumize(tokens, source, source_path)?;
+    let mut datums = datumize(tokens, source, source_path)?;
+    for transformer in transformers {
+        for datum in &mut datums {
+            transformer.transform(datum);
+        }
+    }
     Ok((datums.into_tokens(), vec![]))
 }

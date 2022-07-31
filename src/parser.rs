@@ -1,6 +1,6 @@
 use derive_more::{Display, From};
 
-use crate::*;
+use crate::{transformer::*, *};
 
 pub(super) mod chumsky {
     use chumsky::{combinator::MapWithSpan, prelude::*};
@@ -333,9 +333,16 @@ pub(super) mod chumsky {
     }
 }
 
-#[derive(Default)]
 pub struct Parser {
     transformers: Vec<Box<dyn Transformer>>,
+}
+
+impl Default for Parser {
+    fn default() -> Self {
+        Self {
+            transformers: vec![Box::new(crate::transformer::builtin::Begin)],
+        }
+    }
 }
 
 #[derive(From, Display)]

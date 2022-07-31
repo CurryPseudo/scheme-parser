@@ -102,7 +102,7 @@ fn regression() {
                 error_path.set_extension("datum.err");
                 let mut datum_path = path.clone();
                 datum_path.set_extension("datum");
-                match scheme_parser::datumize(&tokens, &input, &path_str) {
+                match scheme_parser::transformer::datumize(&tokens, &input, &path_str) {
                     Ok(program) => {
                         let content = format!("{:#?}", SpanToSource(&program, &input));
                         assert_eq_or_override(&datum_path, &content, &mut regression_errors);
