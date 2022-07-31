@@ -335,7 +335,7 @@ pub(super) mod chumsky {
 
 #[derive(Default)]
 pub struct Parser {
-    _transformers: Vec<Box<dyn Transformer>>,
+    transformers: Vec<Box<dyn Transformer>>,
 }
 
 #[derive(From, Display)]
@@ -397,10 +397,13 @@ impl Parser {
         use ::chumsky::Parser as _;
         //let datums = datumize(tokens, source, source_path)?;
         //self.parse_datums(tokens, &datums, source, source_path)
+        let (tokens, mut new_transformers) =
+            expansion(&self.transformers, &tokens, source, source_path)?;
+        self.transformers.append(&mut new_transformers);
         chumsky::parser()
             .parse(::chumsky::Stream::from_iter(
                 source.len()..source.len() + 1,
-                tokens.iter().cloned(),
+                tokens.into_iter(),
             ))
             .map_err(|e| {
                 ParseError {
@@ -420,9 +423,6 @@ impl Parser {
         source_path: &'a str,
     ) -> Result<Program, TokenizeOrParseError<'a>> {
         let tokens = tokenize(source, source_path)?;
-        //let (tokens, mut new_transformers) =
-        //    expansion(&self.transformers, &tokens, source, source_path)?;
-        //self.transformers.append(&mut new_transformers);
         self.parse_tokens(&tokens, source, source_path)
     }
 }

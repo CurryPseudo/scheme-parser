@@ -45,7 +45,7 @@ pub fn datums() -> impl Parser<Token, Vec<Spanned<Datum>>, Error = Simple<Token>
             };
             let list = enclosed(datum.repeated())
                 .map(|datums| Datum::List(datums))
-                .labelled("list");
+                .labelled("( ... )");
             spanned(
                 list.or(keyword)
                     .or(primitive)

@@ -27,12 +27,27 @@ pub trait IntoTokens {
 
 impl IntoTokens for Spanned<Datum> {
     fn into_tokens(self) -> Vec<Spanned<Token>> {
-        todo!()
+        let (datum, span) = self;
+        match datum {
+            Datum::Error => unreachable!(),
+            Datum::Keyword(keyword) => vec![(Token::Keyword(keyword), span)],
+            Datum::Primitive(primitive) => vec![(Token::Primitive(primitive), span)],
+            Datum::List(datums) => {
+                let mut tokens = Vec::new();
+                tokens.push((Token::Keyword("("), span.start..span.start + 1));
+                tokens.extend(datums.into_tokens().into_iter());
+                tokens.push((Token::Keyword(")"), span.end - 1..span.end));
+                tokens
+            }
+        }
     }
 }
 
-impl IntoTokens for Vec<Spanned<Datum>> {
+impl<T> IntoTokens for Vec<Spanned<T>>
+where
+    Spanned<T>: IntoTokens,
+{
     fn into_tokens(self) -> Vec<Spanned<Token>> {
-        todo!()
+        self.into_iter().flat_map(|t| t.into_tokens()).collect()
     }
 }
