@@ -19,6 +19,7 @@ pub enum Expression {
         operator: Box<Spanned<Expression>>,
         args: Vec<Spanned<Expression>>,
     },
+    #[from(forward)]
     Primitive(Primitive),
     Procedure {
         /// Arguments

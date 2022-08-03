@@ -71,7 +71,7 @@ pub(super) mod chumsky {
                     num::bigint::Sign::Minus => -numer,
                     _ => numer,
                 };
-                Primitive::Real { numer, denom_log10 }.into()
+                Real { numer, denom_log10 }.into()
             });
         let ident =
             filter(|c: &char| c.is_ascii_alphanumeric() || EXTENDED_IDENTIFIER_CHARS.contains(*c))
