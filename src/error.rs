@@ -7,16 +7,33 @@ use ariadne::{Color, Fmt, FnCache, Label, Report, ReportKind, Source};
 use chumsky::prelude::Simple;
 
 #[derive(Debug, Default)]
-pub struct ParseError<'a, T: Hash> {
-    pub(crate) simple: Vec<Simple<T>>,
-    pub(crate) source: &'a str,
-    pub(crate) source_path: &'a str,
-    pub(crate) type_name: &'static str,
-    pub(crate) colorful: bool,
-    pub(crate) display_every_expected: bool,
+pub struct ParseError<T: Hash> {
+    simple: Vec<Simple<T>>,
+    source: String,
+    source_path: String,
+    type_name: &'static str,
+    colorful: bool,
+    display_every_expected: bool,
 }
 
-impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
+impl<T: Hash> ParseError<T> {
+    pub fn new(
+        source: String,
+        source_path: String,
+        e: Vec<Simple<T>>,
+        type_name: &'static str,
+    ) -> ParseError<T> {
+        ParseError {
+            source,
+            source_path,
+            simple: e,
+            type_name,
+            colorful: false,
+            display_every_expected: true,
+        }
+    }
+}
+impl<T: Hash + Eq + Display> std::fmt::Display for ParseError<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         macro_rules! with_color {
             ($a: expr, $b: expr) => {
@@ -37,7 +54,7 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
             };
         }
         for error in &self.simple {
-            let report = Report::build(ReportKind::Error, self.source_path, error.span().start);
+            let report = Report::build(ReportKind::Error, &self.source_path, error.span().start);
             let report = match error.reason() {
                 chumsky::error::SimpleReason::Unexpected => report
                     .with_message({
@@ -71,7 +88,7 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
                         msg
                     })
                     .with_label(with_color!(
-                        Label::new((self.source_path, error.span())).with_message(format!(
+                        Label::new((&self.source_path, error.span())).with_message(format!(
                             "Unexpected {}",
                             error
                                 .found()
@@ -93,14 +110,14 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
                         },
                     ))
                     .with_label(with_color!(
-                        Label::new((self.source_path, span.clone())).with_message(format!(
+                        Label::new((&self.source_path, span.clone())).with_message(format!(
                             "Unclosed delimiter {}",
                             fg!(delimiter, Color::Yellow)
                         )),
                         Color::Yellow
                     ))
                     .with_label(with_color!(
-                        Label::new((self.source_path, error.span())).with_message(format!(
+                        Label::new((&self.source_path, error.span())).with_message(format!(
                             "Must be closed before this {}",
                             fg!(
                                 error
@@ -123,7 +140,7 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
                         },
                     ))
                     .with_label(with_color!(
-                        Label::new((self.source_path, error.span()))
+                        Label::new((&self.source_path, error.span()))
                             .with_message(format!("{}", fg!(msg, Color::Red))),
                         Color::Red
                     )),
@@ -139,11 +156,11 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
                     )
                     .with_sources(
                         vec![(
-                            self.source_path,
+                            &self.source_path,
                             if self.source.is_empty() {
                                 " "
                             } else {
-                                self.source
+                                &self.source
                             },
                         )]
                         .into_iter()
@@ -162,7 +179,9 @@ impl<'a, T: Hash + Eq + Display> std::fmt::Display for ParseError<'a, T> {
     }
 }
 
-impl<'a, T: Hash> ParseError<'a, T> {
+impl<T: Hash + Eq + Display + Debug> std::error::Error for ParseError<T> {}
+
+impl<T: Hash> ParseError<T> {
     /// Should display with color or not, default: false
     pub fn with_color(self, colorful: bool) -> Self {
         ParseError { colorful, ..self }

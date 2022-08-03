@@ -61,11 +61,11 @@ pub fn datums() -> impl Parser<Token, Vec<Spanned<Datum>>, Error = Simple<Token>
         .repeated()
         .then_ignore(end())
 }
-pub fn datumize<'a>(
+pub fn datumize(
     tokens: &[Spanned<Token>],
-    source: &'a str,
-    source_path: &'a str,
-) -> Result<Vec<Spanned<Datum>>, ParseError<'a, Token>> {
+    source: &str,
+    source_path: &str,
+) -> Result<Vec<Spanned<Datum>>, ParseError<Token>> {
     use ::chumsky::Parser as _;
     let len = source.len();
     datums()
@@ -73,21 +73,15 @@ pub fn datumize<'a>(
             len..len + 1,
             tokens.iter().cloned(),
         ))
-        .map_err(|e| ParseError {
-            source,
-            source_path,
-            simple: e,
-            type_name: "token",
-            colorful: false,
-            display_every_expected: true,
-        })
+        .map_err(|e| ParseError::new(source.to_owned(), source_path.to_owned(), e, "token"))
 }
-pub fn expansion<'a>(
+
+pub fn expansion(
     transformers: &[Box<dyn Transformer>],
     tokens: &[Spanned<Token>],
-    source: &'a str,
-    source_path: &'a str,
-) -> Result<(Vec<Spanned<Token>>, Vec<Box<dyn Transformer>>), ParseError<'a, Token>> {
+    source: &str,
+    source_path: &str,
+) -> Result<(Vec<Spanned<Token>>, Vec<Box<dyn Transformer>>), ParseError<Token>> {
     let mut datums = datumize(tokens, source, source_path)?;
     for transformer in transformers {
         for datum in &mut datums {

@@ -99,17 +99,9 @@ pub(super) mod chumsky {
     }
 }
 
-pub fn tokenize<'a>(
-    source: &'a str,
-    source_path: &'a str,
-) -> Result<Vec<Spanned<Token>>, ParseError<'a, char>> {
+pub fn tokenize(source: &str, source_path: &str) -> Result<Vec<Spanned<Token>>, ParseError<char>> {
     use ::chumsky::Parser;
-    chumsky::lexer().parse(source).map_err(|e| ParseError {
-        source,
-        source_path,
-        simple: e,
-        type_name: "char",
-        colorful: false,
-        display_every_expected: false,
-    })
+    chumsky::lexer()
+        .parse(source)
+        .map_err(|e| ParseError::new(source.to_owned(), source_path.to_owned(), e, "char"))
 }

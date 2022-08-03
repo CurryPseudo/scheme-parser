@@ -183,13 +183,14 @@ impl Default for Parser {
     }
 }
 
-#[derive(From, Display)]
-pub enum TokenizeOrParseError<'a> {
-    Tokenize(ParseError<'a, char>),
-    Parse(ParseError<'a, Token>),
+#[derive(From, Display, Debug)]
+pub enum TokenizeOrParseError {
+    Tokenize(ParseError<char>),
+    Parse(ParseError<Token>),
 }
+impl std::error::Error for TokenizeOrParseError {}
 
-impl<'a> TokenizeOrParseError<'a> {
+impl TokenizeOrParseError {
     /// Should display with color or not, default: false
     pub fn with_color(self, colorful: bool) -> Self {
         match self {
@@ -202,12 +203,12 @@ impl<'a> TokenizeOrParseError<'a> {
 }
 
 impl Parser {
-    pub fn parse_tokens<'a>(
+    pub fn parse_tokens(
         &mut self, // We might add new transformer in self
         tokens: &[Spanned<Token>],
-        source: &'a str,
-        source_path: &'a str,
-    ) -> Result<Program, TokenizeOrParseError<'a>> {
+        source: &str,
+        source_path: &str,
+    ) -> Result<Program, TokenizeOrParseError> {
         use ::chumsky::Parser as _;
         let (tokens, mut new_transformers) =
             expansion(&self.transformers, &tokens, source, source_path)?;
@@ -218,22 +219,14 @@ impl Parser {
                 tokens.into_iter(),
             ))
             .map_err(|e| {
-                ParseError {
-                    source,
-                    source_path,
-                    simple: e,
-                    type_name: "token",
-                    colorful: false,
-                    display_every_expected: true,
-                }
-                .into()
+                ParseError::new(source.to_owned(), source_path.to_owned(), e, "token").into()
             })
     }
-    pub fn parse<'a>(
+    pub fn parse(
         &mut self, // We might add new transformer in self
-        source: &'a str,
-        source_path: &'a str,
-    ) -> Result<Program, TokenizeOrParseError<'a>> {
+        source: &str,
+        source_path: &str,
+    ) -> Result<Program, TokenizeOrParseError> {
         let tokens = tokenize(source, source_path)?;
         self.parse_tokens(&tokens, source, source_path)
     }
