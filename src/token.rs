@@ -23,6 +23,10 @@ impl ToPrimitive for Real {
     fn to_u64(&self) -> Option<u64> {
         Ratio::new(self.numer.clone(), self.denom()).to_u64()
     }
+
+    fn to_f64(&self) -> Option<f64> {
+        Ratio::new(self.numer.clone(), self.denom()).to_f64()
+    }
 }
 
 impl Display for Real {
