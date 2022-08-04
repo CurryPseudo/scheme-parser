@@ -210,9 +210,7 @@ impl Parser {
         source_path: &str,
     ) -> Result<Program, TokenizeOrParseError> {
         use ::chumsky::Parser as _;
-        let (tokens, mut new_transformers) =
-            expansion(&self.transformers, &tokens, source, source_path)?;
-        self.transformers.append(&mut new_transformers);
+        let tokens = expansion(&mut self.transformers, tokens, source, source_path)?;
         chumsky::parser()
             .parse(::chumsky::Stream::from_iter(
                 source.len()..source.len() + 1,

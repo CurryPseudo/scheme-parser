@@ -45,7 +45,7 @@ pub fn datums() -> impl Parser<Token, Vec<Spanned<Datum>>, Error = Simple<Token>
                 }
             };
             let list = enclosed(datum.repeated())
-                .map(|datums| Datum::List(datums))
+                .map(Datum::List)
                 .labelled("( ... )");
             spanned(
                 list.or(keyword)
@@ -77,16 +77,16 @@ pub fn datumize(
 }
 
 pub fn expansion(
-    transformers: &[Box<dyn Transformer>],
+    transformers: &mut Vec<Box<dyn Transformer>>,
     tokens: &[Spanned<Token>],
     source: &str,
     source_path: &str,
-) -> Result<(Vec<Spanned<Token>>, Vec<Box<dyn Transformer>>), ParseError<Token>> {
+) -> Result<Vec<Spanned<Token>>, ParseError<Token>> {
     let mut datums = datumize(tokens, source, source_path)?;
     for transformer in transformers {
         for datum in &mut datums {
             transformer.transform(datum);
         }
     }
-    Ok((datums.into_tokens(), vec![]))
+    Ok(datums.into_tokens())
 }

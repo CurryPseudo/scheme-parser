@@ -33,8 +33,7 @@ impl IntoTokens for Spanned<Datum> {
             Datum::Keyword(keyword) => vec![(Token::Keyword(keyword), span)],
             Datum::Primitive(primitive) => vec![(Token::Primitive(primitive), span)],
             Datum::List(datums) => {
-                let mut tokens = Vec::new();
-                tokens.push((Token::Keyword("("), span.start..span.start + 1));
+                let mut tokens = vec![(Token::Keyword("("), span.start..span.start + 1)];
                 tokens.extend(datums.into_tokens().into_iter());
                 tokens.push((Token::Keyword(")"), span.end - 1..span.end));
                 tokens

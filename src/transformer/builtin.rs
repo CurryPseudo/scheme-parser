@@ -18,7 +18,7 @@ impl Transformer for Begin {
             if is_matched {
                 let list = list.drain(1..);
                 lambda_list.push((Datum::Keyword("lambda"), begin_span.clone()));
-                lambda_list.push((Datum::List(vec![]), begin_span.clone()));
+                lambda_list.push((Datum::List(vec![]), begin_span));
                 lambda_list.extend(list);
             }
         }
