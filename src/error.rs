@@ -32,6 +32,12 @@ impl<T: Hash> ParseError<T> {
             display_every_expected: true,
         }
     }
+    pub fn display_every_expected(self, enable: bool) -> Self {
+        Self {
+            display_every_expected: enable,
+            ..self
+        }
+    }
 }
 impl<T: Hash + Eq + Display> std::fmt::Display for ParseError<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

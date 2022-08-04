@@ -50,7 +50,7 @@ ProcedureBody {
                         },
                     },
                     Source(
-                        "(define (one) 1)",
+                        "(one) 1",
                     ),
                 ),
             ),
@@ -92,7 +92,7 @@ ProcedureBody {
                         },
                     },
                     Source(
-                        "(define (id x) x)",
+                        "(id x) x",
                     ),
                 ),
             ),

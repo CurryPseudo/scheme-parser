@@ -122,20 +122,20 @@ pub(super) mod chumsky {
             });
             let def_proc = enclosed(
                 just(Token::Keyword("define"))
-                    .ignore_then(enclosed(ident.then(ident.repeated())))
+                    .ignore_then(spanned(enclosed(ident.then(ident.repeated()))))
                     .then(proc_body),
             )
-            .map_with_span(|((ident, args), body), span| {
-                Definition(
-                    ident,
+            .map(|(((ident, args), formal_span), body)| {
+                Definition(ident, {
+                    let body_span_end = body.last_expr.1.end;
                     (
                         Expression::Procedure {
                             args,
                             body: Box::new(body),
                         },
-                        span,
-                    ),
-                )
+                        formal_span.start..body_span_end,
+                    )
+                })
             });
             let def = map_err_category!(
                 "<definition>",

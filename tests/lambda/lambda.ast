@@ -136,10 +136,12 @@ ProcedureBody {
                                     args: [
                                         (
                                             Primitive(
-                                                Real {
-                                                    numer: 357,
-                                                    denom_log10: 2,
-                                                },
+                                                Real(
+                                                    Real {
+                                                        numer: 357,
+                                                        denom_log10: 2,
+                                                    },
+                                                ),
                                             ),
                                             Source(
                                                 "3.57",

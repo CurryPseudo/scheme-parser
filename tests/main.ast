@@ -56,10 +56,12 @@ ProcedureBody {
                 ),
                 (
                     Primitive(
-                        Real {
-                            numer: 3126,
-                            denom_log10: 3,
-                        },
+                        Real(
+                            Real {
+                                numer: 3126,
+                                denom_log10: 3,
+                            },
+                        ),
                     ),
                     Source(
                         "3.126",

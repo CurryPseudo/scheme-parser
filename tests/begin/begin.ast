@@ -29,10 +29,12 @@ ProcedureBody {
                                     ),
                                     (
                                         Primitive(
-                                            Real {
-                                                numer: 53,
-                                                denom_log10: 1,
-                                            },
+                                            Real(
+                                                Real {
+                                                    numer: 53,
+                                                    denom_log10: 1,
+                                                },
+                                            ),
                                         ),
                                         Source(
                                             "5.3",

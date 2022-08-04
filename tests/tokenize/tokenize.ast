@@ -23,10 +23,12 @@ ProcedureBody {
         ),
         (
             Primitive(
-                Real {
-                    numer: 3561245,
-                    denom_log10: 6,
-                },
+                Real(
+                    Real {
+                        numer: 3561245,
+                        denom_log10: 6,
+                    },
+                ),
             ),
             Source(
                 "3.561245",
@@ -34,10 +36,12 @@ ProcedureBody {
         ),
         (
             Primitive(
-                Real {
-                    numer: 12316561231323,
-                    denom_log10: 2,
-                },
+                Real(
+                    Real {
+                        numer: 12316561231323,
+                        denom_log10: 2,
+                    },
+                ),
             ),
             Source(
                 "123165612313.23",
@@ -45,10 +49,12 @@ ProcedureBody {
         ),
         (
             Primitive(
-                Real {
-                    numer: 1298312986419284719284719283419285192783912873192873198274198,
-                    denom_log10: 32,
-                },
+                Real(
+                    Real {
+                        numer: 1298312986419284719284719283419285192783912873192873198274198,
+                        denom_log10: 32,
+                    },
+                ),
             ),
             Source(
                 "12983129864192847192847192834.19285192783912873192873198274198",
@@ -76,10 +82,12 @@ ProcedureBody {
         ),
         (
             Primitive(
-                Real {
-                    numer: 315124123,
-                    denom_log10: 4,
-                },
+                Real(
+                    Real {
+                        numer: 315124123,
+                        denom_log10: 4,
+                    },
+                ),
             ),
             Source(
                 "+31512.4123",
@@ -87,10 +95,12 @@ ProcedureBody {
         ),
         (
             Primitive(
-                Real {
-                    numer: -316167,
-                    denom_log10: 4,
-                },
+                Real(
+                    Real {
+                        numer: -316167,
+                        denom_log10: 4,
+                    },
+                ),
             ),
             Source(
                 "-31.6167",

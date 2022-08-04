@@ -10,10 +10,12 @@ ProcedureBody {
                 ),
                 (
                     Primitive(
-                        Real {
-                            numer: 15,
-                            denom_log10: 1,
-                        },
+                        Real(
+                            Real {
+                                numer: 15,
+                                denom_log10: 1,
+                            },
+                        ),
                     ),
                     Source(
                         "1.5",
@@ -59,10 +61,12 @@ ProcedureBody {
                 ),
                 (
                     Primitive(
-                        Real {
-                            numer: 5,
-                            denom_log10: 1,
-                        },
+                        Real(
+                            Real {
+                                numer: 5,
+                                denom_log10: 1,
+                            },
+                        ),
                     ),
                     Source(
                         "0.5",
