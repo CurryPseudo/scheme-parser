@@ -191,7 +191,7 @@ pub enum TokenizeOrParseError {
 impl std::error::Error for TokenizeOrParseError {}
 
 impl TokenizeOrParseError {
-    /// Should display with color or not, default: false
+    /// Should display with color or not, default: true
     pub fn with_color(self, colorful: bool) -> Self {
         match self {
             TokenizeOrParseError::Tokenize(e) => {

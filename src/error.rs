@@ -28,7 +28,7 @@ impl<T: Hash> ParseError<T> {
             source_path,
             simple: e,
             type_name,
-            colorful: false,
+            colorful: true,
             display_every_expected: true,
         }
     }
@@ -188,7 +188,7 @@ impl<T: Hash + Eq + Display> std::fmt::Display for ParseError<T> {
 impl<T: Hash + Eq + Display + Debug> std::error::Error for ParseError<T> {}
 
 impl<T: Hash> ParseError<T> {
-    /// Should display with color or not, default: false
+    /// Should display with color or not, default: true
     pub fn with_color(self, colorful: bool) -> Self {
         ParseError { colorful, ..self }
     }
