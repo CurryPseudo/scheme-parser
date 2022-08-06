@@ -89,7 +89,9 @@ fn regression() {
                     Some(tokens)
                 }
                 Err(error) => {
-                    let content = error.to_string();
+                    let content =
+                        String::from_utf8(strip_ansi_escapes::strip(error.to_string()).unwrap())
+                            .unwrap();
                     assert_eq_or_override(&error_path, &content, &mut regression_errors);
                     assert_non_exist(&token_path, &mut regression_errors);
                     None
@@ -111,7 +113,10 @@ fn regression() {
                     }
                     Err(error) => {
                         assert_non_exist(&datum_path, &mut regression_errors);
-                        let content = error.to_string();
+                        let content = String::from_utf8(
+                            strip_ansi_escapes::strip(error.to_string()).unwrap(),
+                        )
+                        .unwrap();
                         assert_eq_or_override(&error_path, &content, &mut regression_errors);
                         false
                     }
@@ -132,7 +137,10 @@ fn regression() {
                         }
                         Err(error) => {
                             assert_non_exist(&ast_path, &mut regression_errors);
-                            let content = error.to_string();
+                            let content = String::from_utf8(
+                                strip_ansi_escapes::strip(error.to_string()).unwrap(),
+                            )
+                            .unwrap();
                             assert_eq_or_override(&error_path, &content, &mut regression_errors);
                         }
                     }
